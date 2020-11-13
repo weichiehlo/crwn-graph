@@ -1,0 +1,7 @@
+const StockNewsActionTypes = {
+    FETCH_STOCK_NEWS_START: 'FETCH_STOCK_NEWS_START',
+    FETCH_STOCK_NEWS_SUCCESS: 'FETCH_STOCK_NEWS_SUCCESS',
+    FETCH_STOCK_NEWS_FAILURE: 'FETCH_STOCK_NEWS_FAILURE'
+  };
+  
+  export default StockNewsActionTypes;
