@@ -2,9 +2,12 @@ import React, {useState,useEffect} from 'react'
 import { Area, Bar, ComposedChart, Line, CartesianGrid, XAxis, YAxis,Tooltip,Legend,Scatter } from 'recharts';
 import { ComposedChartContainer, Title, FormContainer} from './composed-chart.styles'
 import { getChartColor } from '../../utils/graph.utils'
-import axios from 'axios';
 import { FormInput, FormSelect } from '../form-input/form-input.component';
 import CustomButton from '../custom-button/custom-button.component';
+import { fetchGraphStart } from '../../redux/graph/graph.actions'
+import { selectGraph } from '../../redux/graph/graph.selectors'
+import { connect } from 'react-redux';
+import { createStructuredSelector } from 'reselect';
 
 const options = [
     { value: 'chocolate', label: 'Chocolate' },
@@ -12,32 +15,18 @@ const options = [
     { value: 'vanilla', label: 'Vanilla' }
   ]
 
-const ComposedChartComponent = function({data}){
+const ComposedChartComponent = function({data,fetchGraphStart,graph}){
 
-    const [sensor, setSensor] = useState(false);
-    useEffect(() => {
-    let helper = async()=>{
-      await getSensor("PS1 Temp 1");
-      await getSensor("PS1 Temp 2");
-    }
-    helper();
-    }, []);   
-    const getSensor = async(name) =>{
-        const response = await axios({
-            url:'query',
-            method: 'post', 
-            data: { query: `SELECT * FROM \"${name}\"` }});
-        console.log(response)
-        setSensor(JSON.stringify(response.data))
-    }
     //get sensor name
     const sensorNames = Object.keys(data[0]).filter((el)=>el !=='name')
     const graphingData = (getChartColor(sensorNames))
 
     const handleSubmit = async event => {
         event.preventDefault();
-    
         console.log("SuBMIT")
+        // console.log(sensor)
+        await fetchGraphStart({title:'MyGraphTitle', query:`SELECT * FROM \"PS1 Temp 1"`, database: 'FG181F'})
+        console.log(graph)
       };
     const handleChange = event => {
 
@@ -154,4 +143,15 @@ const ComposedChartComponent = function({data}){
     )
 }
 
-export default ComposedChartComponent
+const mapStateToProps = createStructuredSelector({
+    graph: selectGraph
+  });
+  
+  const mapDispatchToProps = dispatch => ({
+    fetchGraphStart: (info) => dispatch(fetchGraphStart(info))
+  });
+
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+  ) (ComposedChartComponent)

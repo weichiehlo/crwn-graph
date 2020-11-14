@@ -54,7 +54,7 @@ app.post('/payment', (req, res) => {
 });
 
 app.post('/query', (req, res) => {
-  pg.getQueryData(req.body.query)
+  pg.getQueryData(req.body)
   .then(response=>{
       res.status(200).send(response);
   })

@@ -6,6 +6,8 @@ import userReducer from './user/user.reducer';
 import directoryReducer from './directory/directory.reducer';
 import stockPricesReducer from './stock-price/stock-price.reducer'
 import stockNewsReducer from './stock-news/stock-news.reducer'
+import graphReducer from './graph/graph.reducer'
+
 
 const persistConfig = {
   key: 'root',
@@ -17,7 +19,8 @@ const rootReducer = combineReducers({
   user: userReducer,
   directory: directoryReducer,
   stockPrice: stockPricesReducer,
-  stockNews:stockNewsReducer
+  stockNews: stockNewsReducer,
+  graph: graphReducer
 });
 
 export default persistReducer(persistConfig, rootReducer);

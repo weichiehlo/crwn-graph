@@ -1,25 +1,25 @@
-import StockNewsActionTypes from './stock-news.type';
+import GraphActionTypes from './graph.type';
 
 const INITIAL_STATE = {
-    stockNews:{},
+    graph:{},
     isFetching: false,
     errorMessage:undefined
 };
 
-const stockNewsReducer = (state = INITIAL_STATE, action) => {
+const graphReducer = (state = INITIAL_STATE, action) => {
     switch (action.type) {
-      case StockNewsActionTypes.FETCH_STOCK_NEWS_START:
+      case GraphActionTypes.FETCH_GRAPH_START:
         return {
           ...state,
           isFetching: true
         };
-      case StockNewsActionTypes.FETCH_STOCK_NEWS_SUCCESS:
+      case GraphActionTypes.FETCH_GRAPH_SUCCESS:
         return {
           ...state,
           isFetching: false,
-          stockNews: {...state.stockNews,...action.payload}
+          graph: {...state.graph,...action.payload}
         };
-      case StockNewsActionTypes.FETCH_STOCK_NEWS_FAILURE:
+      case GraphActionTypes.FETCH_GRAPH_FAILURE:
         return {
           ...state,
           isFetching: false,
@@ -30,5 +30,5 @@ const stockNewsReducer = (state = INITIAL_STATE, action) => {
     }
   };
   
-  export default stockNewsReducer;
+  export default graphReducer;
   
