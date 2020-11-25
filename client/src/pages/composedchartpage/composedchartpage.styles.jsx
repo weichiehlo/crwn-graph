@@ -1,25 +1,16 @@
 import styled from 'styled-components';
 
-export const StockPriceContainer = styled.div`
+export const FormContainer = styled.form`
   display: flex;
   flex-direction: column;
-  align-items: center;
-`;
-
-export const StockPriceHeaderContainer = styled.div`
-  width: 100%;
-  display: flex;
   justify-content: center;
-  border-bottom: 3px solid darkgrey;
+  padding: 10px 20px;
+  align-items:center;
+  border-radius: 25px;
+  gap: 12px;
 `;
 
-export const StockPriceTitle = styled.h2`
-  font-family: times, Times New Roman, times-roman, georgia, serif;
-	color: #444;
-	margin: 0;
-	padding: 0px 0px 6px 0px;
-	font-size: 51px;
-	line-height: 44px;
-	letter-spacing: -2px;
-	font-weight: bold;
+export const ComposedChartPageContainer = styled.div`
+  display: flex;
+  flex-direction: column;
 `;

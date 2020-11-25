@@ -1,7 +1,0 @@
-const GraphActionTypes = {
-    FETCH_GRAPH_START: 'FETCH_GRAPH_DATA_START',
-    FETCH_GRAPH_SUCCESS: 'FETCH_GRAPH_DATA_SUCCESS',
-    FETCH_GRAPH_FAILURE: 'FETCH_GRAPH_DATA_FAILURE'
-  };
-  
-  export default GraphActionTypes;

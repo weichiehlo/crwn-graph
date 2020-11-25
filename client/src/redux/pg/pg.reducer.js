@@ -1,25 +1,25 @@
-import GraphActionTypes from './graph.type';
+import pgActionTypes from './pg.type';
 
 const INITIAL_STATE = {
-    graph:{},
-    isFetching: false,
+    pg_data:{},
+    isFetching: true,
     errorMessage:undefined
 };
 
-const graphReducer = (state = INITIAL_STATE, action) => {
+const pgReducer = (state = INITIAL_STATE, action) => {
     switch (action.type) {
-      case GraphActionTypes.FETCH_GRAPH_START:
+      case pgActionTypes.FETCH_PG_START:
         return {
           ...state,
           isFetching: true
         };
-      case GraphActionTypes.FETCH_GRAPH_SUCCESS:
+      case pgActionTypes.FETCH_PG_SUCCESS:
         return {
           ...state,
           isFetching: false,
-          graph: {...state.graph,...action.payload}
+          pg_data: {...state.pg_data,...action.payload}
         };
-      case GraphActionTypes.FETCH_GRAPH_FAILURE:
+      case pgActionTypes.FETCH_PG_FAILURE:
         return {
           ...state,
           isFetching: false,
@@ -30,5 +30,5 @@ const graphReducer = (state = INITIAL_STATE, action) => {
     }
   };
   
-  export default graphReducer;
+  export default pgReducer;
   

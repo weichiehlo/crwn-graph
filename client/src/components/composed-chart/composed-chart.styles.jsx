@@ -17,12 +17,4 @@ export const Title = styled.h1`
   border-bottom: 5px solid red;
 `;
 
-export const FormContainer = styled.form`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 10px 20px;
-  align-items:center;
-  border-radius: 25px;
-`;
 
