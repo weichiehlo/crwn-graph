@@ -14,19 +14,25 @@ import 'react-date-range/dist/theme/default.css'; // theme css file
 import { DateRangePicker  } from 'react-date-range';
 
 
+
 const ComposedChartPage = ({fetchPgStart,pg,fetching}) => {
 
-    
-    const [graphInfo, setgraphInfo] = useState({
+    const initialState = {
       model: '',
       table: '',
       testType: '',
       lowerSN: '',
       upperSN: '',
-      lowerDate:'',
-      upperDate:'',
-      percision:1
-    });
+      range:[{
+        startDate: '',
+        endDate: '',
+        key: 'selection'
+      }],
+      percision:3
+    }
+    
+    const [graphInfo, setgraphInfo] = useState(initialState);
+
 
     useEffect(() => {
     let helper = async()=>{
@@ -39,19 +45,33 @@ const ComposedChartPage = ({fetchPgStart,pg,fetching}) => {
 
   useEffect(() => {
     let info = {};
+    if(graphInfo['table'])
+    {
+      if(pg['databaseTestType']){
+        info = {...info, 'testType': pg['databaseTestType'].map((el)=>el['test_type'])}
+      }
+      if(pg['databaseMinSN']){
+        info = {...info, 'lowerSN': pg['databaseMinSN'][0]['min']}
+      }
+      if(pg['databaseMaxSN']){
+        info = {...info, 'upperSN': pg['databaseMaxSN'][0]['max']}
+      }
+      if(pg['databaseMinDate']){
+        let temp = graphInfo['range'];
+        temp[0]['startDate'] = new Date(pg['databaseMinDate'][0]['min']);
+        info = {...info, 'range': temp};
+      }
+      if(pg['databaseMaxDate']){
+        let temp = graphInfo['range'];
+        temp[0]['endDate'] = new Date(pg['databaseMaxDate'][0]['max']);
+        info = {...info, 'range':  temp};
+      }else{
+        
+      }
+    }
+    
 
-    if(pg['databaseMinSN']){
-      info = {...info, 'lowerSN': pg['databaseMinSN'][0]['min']}
-    }
-    if(pg['databaseMaxSN']){
-      info = {...info, 'upperSN': pg['databaseMaxSN'][0]['max']}
-    }
-    if(pg['databaseMinDate']){
-      info = {...info, 'lowerDate': pg['databaseMinDate'][0]['min']};
-    }
-    if(pg['databaseMaxDate']){
-      info = {...info, 'upperDate':  pg['databaseMaxDate'][0]['max']};
-    }
+
     setgraphInfo({ ...graphInfo, ...info });
      
   }, [pg]);
@@ -92,6 +112,7 @@ const ComposedChartPage = ({fetchPgStart,pg,fetching}) => {
     setgraphInfo({ ...graphInfo, [name]: value });
     switch(name){
       case 'model':
+        if(graphInfo['table']) setgraphInfo({...initialState,'model':value});
         await fetchPgStart({title:'databaseSensor', query:`SELECT sensor_name FROM "sensor_to_unit"`, database: value})
         break;
       case 'table':
@@ -105,21 +126,11 @@ const ComposedChartPage = ({fetchPgStart,pg,fetching}) => {
     }
 
   };
-  const handleSelect = (range)=>{
-    console.log(range); // native Date object
-  }
-  const selectionRange = {
-    startDate: new Date(),
-    endDate: new Date(),
-    key: 'selection',
-  }
+ 
+  
   return (
     <ComposedChartPageContainer>
       <FormContainer onSubmit={handleSubmit}>
-        <DateRangePicker
-          ranges={[selectionRange]}
-          onChange={handleSelect}
-        />
         {pg['databaseModel']?
           <FormSelect
           label='Model'
@@ -139,73 +150,75 @@ const ComposedChartPage = ({fetchPgStart,pg,fetching}) => {
                 <FormSelect
                 label='Sensor'
                 placeholder=""
+                value={{value:graphInfo['table'],label:graphInfo['table']}}
                 options={pg['databaseSensor'].map((el)=>({value:el['sensor_name'],label:el['sensor_name']}))}
                 onChange={(el)=>handleChange({...el,name:'table'})}
                 required
                 />
               :
-               <div/>
+              <Spinner/>
             }
             
             {
-              pg['databaseTestType']?
-                <FormSelect
-                label='Test Type'
-                placeholder="Select Test Type"
-                isMulti
-                name="testType"
-                options={pg['databaseTestType'].map((el)=>({value:el['test_type'],label:el['test_type']}))}
-                onChange={(el)=>handleChange({value:el.map(el=>el.value),name:'testType'})}
-            />
-              :
+              graphInfo['testType']&&graphInfo['lowerSN']&&graphInfo['upperSN']&&graphInfo['range'][0]['startDate'] && graphInfo['range'][0]['endDate']?
+                <div>
+                  <FormSelect
+                  label='Test Type'
+                  placeholder="Select Test Type"
+                  isMulti
+                  name="testType"
+                  value={graphInfo['testType'].map((el)=>({value:el,label:el}))}
+                  options={pg['databaseTestType'].map((el)=>({value:el['test_type'],label:el['test_type']}))}
+                  onChange={(el)=>handleChange({value:el.map(el=>el.value),name:'testType'})}
+                  required
+                  />
+                  <FormInput
+                    type='text'
+                    name='lowerSN'
+                    value={graphInfo.lowerSN}
+                    onChange={handleChange}
+                    label='Lower Serial Number'
+                  />
 
+                  <FormInput
+                  type='text'
+                  name='upperSN'
+                  value={graphInfo.upperSN}
+                  onChange={handleChange}
+                  label='Upper Serial Number'
+                  />
+                  <DateRangePicker
+                  onChange={item => setgraphInfo({ ...graphInfo, range: [item.selection] })}
+                  showSelectionPreview={true}
+                  moveRangeOnFirstSelection={false}
+                  months={2}
+                  ranges={graphInfo['range']}
+                  direction="horizontal"
+                  />
+                  <FormSelect
+                  label='Percision'
+                  placeholder=""
+                  value={{value:graphInfo['percision'],label:graphInfo['percision']}}
+                  options={[...new Array(10).keys()].map(el=>({value:el+1,label:el+1}))}
+                  onChange={(el)=>handleChange({...el,name:'percision'})}
+                  required
+                  />
+              
+                </div>
+              :
+              graphInfo['table']?
+              <Spinner/>
+              :
               <div/>
             }
-            {
-              pg['databaseTestType']?
-              <FormInput
-              type='text'
-              name='lowerSN'
-              value={graphInfo.lowerSN}
-              onChange={handleChange}
-              label='Lower Serial Number'
-            />
-              :
-
-              <div/>
-            }
-            {
-              pg['databaseTestType']?
-              <FormInput
-              type='text'
-              name='upperSN'
-              value={graphInfo.upperSN}
-              onChange={handleChange}
-              label='Upper Serial Number'
-            />
-              :
-
-              <div/>
-            }
-            {/* {
-              graphInfo['lowerDate']?
-              <DatePicker selected={Date.parse(graphInfo['lowerDate'])}  onChange={(el)=>handleChange({...el,name:'lowerDate'})} />
-              :
-
-              <div/>
-    
-            } */
             
-            }
-        
           </div>
-          
           :
-          <div/>
+          <div/>    
           }
       
     
-          <CustomButton type='submit'>Graph</CustomButton>
+      < CustomButton type='submit'>Graph</CustomButton>
       </FormContainer>
       <ComposedChartComponent data={data}/>
     </ComposedChartPageContainer>
