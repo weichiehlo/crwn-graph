@@ -12,10 +12,12 @@ import Spinner from '../../components/spinner/spinner.component';
 import 'react-date-range/dist/styles.css'; // main style file
 import 'react-date-range/dist/theme/default.css'; // theme css file
 import { DateRangePicker  } from 'react-date-range';
+import { formatDate } from '../../utils/inputs.utils'
+import { convertGraphData } from '../../utils/graph.utils'
 
 
 
-const ComposedChartPage = ({fetchPgStart,pg,fetching}) => {
+const ComposedChartPage = ({fetchPgStart,pg,isFetching}) => {
 
     const initialState = {
       model: '',
@@ -32,13 +34,15 @@ const ComposedChartPage = ({fetchPgStart,pg,fetching}) => {
     }
     
     const [graphInfo, setgraphInfo] = useState(initialState);
+    const [userTable, setUserTable] = useState({
+      all:[],
+      selected:[]});
 
 
-    useEffect(() => {
-    let helper = async()=>{
+  useEffect(() => {
+    const helper = async()=>{
        //fetch the name of the databases
        await fetchPgStart({title:'databaseModel', query:`SELECT datname FROM pg_database WHERE datname != 'template1' AND datname != 'template0' AND datname != 'postgres'`, database: ''})
-       
     }
     helper();
   }, []);
@@ -65,13 +69,9 @@ const ComposedChartPage = ({fetchPgStart,pg,fetching}) => {
         let temp = graphInfo['range'];
         temp[0]['endDate'] = new Date(pg['databaseMaxDate'][0]['max']);
         info = {...info, 'range':  temp};
-      }else{
-        
       }
     }
     
-
-
     setgraphInfo({ ...graphInfo, ...info });
      
   }, [pg]);
@@ -98,12 +98,29 @@ const ComposedChartPage = ({fetchPgStart,pg,fetching}) => {
   ];
   const handleSubmit = async event => {
     event.preventDefault();
-    console.log(fetching)
-    console.log("SuBMIT")
-    console.log(graphInfo)
-    // await fetchPgStart({title:'MyGraphTitle', query:`SELECT * FROM \"PS1 Temp 1"`, database: 'FG181F'})
-    // setModelList(pg['databaseModel'].map((el)=>el['datname']));
-    // await fetchPgStart({title:'databaseModel', query:`SELECT datname FROM pg_database WHERE datname != 'template1' AND datname != 'template0' AND datname != 'postgres'`, database: 'FG181F'})
+   
+    // console.log(graphInfo)
+    console.log('----------')
+    const {model,
+    table,
+    testType,
+    lowerSN,
+    upperSN,
+    percision} = graphInfo
+    const startDate = formatDate(graphInfo['range'][0]['startDate']);
+    const endDate = formatDate(graphInfo['range'][0]['endDate']);
+    const tableName = model + "_" + table
+
+    console.log(model, table, testType, lowerSN,upperSN,startDate,endDate,percision)
+    
+
+    await fetchPgStart({title:tableName,
+    query:`SELECT * FROM "${table}" WHERE test_date >= '${startDate}' AND test_date <= '${endDate}'
+    AND serial_number >= '${lowerSN}' AND serial_number <= '${upperSN}' 
+    AND test_type = 'ITS' OR test_type = 'IQC' ORDER BY reading`,
+    database: model})
+    setUserTable({...userTable,all:[...userTable.all,tableName]})
+    
   };
 
 
@@ -126,6 +143,12 @@ const ComposedChartPage = ({fetchPgStart,pg,fetching}) => {
     }
 
   };
+
+  const handleGraph = () =>{
+    console.log(userTable)
+
+    // convertGraphData(pg[userTable[0]].map((el)=>el.reading),graphInfo['percision'])
+  }
  
   
   return (
@@ -217,9 +240,32 @@ const ComposedChartPage = ({fetchPgStart,pg,fetching}) => {
           <div/>    
           }
       
-    
-      < CustomButton type='submit'>Graph</CustomButton>
+      {
+        graphInfo['table']?
+        < CustomButton type='submit'>Add to Graph</CustomButton>
+        :
+        <div/>
+      }
       </FormContainer>
+      {
+        userTable['all'].length?
+        <div>
+          <FormSelect
+                  label='User Tables'
+                  placeholder="Select Tables"
+                  isMulti
+                  name="userTable"
+                  value={userTable.selected.map((el)=>({value:el,label:el}))}
+                  options={userTable.all.map((el)=>({value:el,label:el}))}
+                  onChange={(el)=>(el?setUserTable({...userTable,selected:el.map(el=>el.value)}):setUserTable({...userTable,selected:[]}))}
+                  required
+                  />
+          < CustomButton onClick={handleGraph}>Graph Selected</CustomButton>
+        </div>
+        
+        :
+        <div/>
+      }
       <ComposedChartComponent data={data}/>
     </ComposedChartPageContainer>
     
@@ -229,7 +275,7 @@ const ComposedChartPage = ({fetchPgStart,pg,fetching}) => {
 
 const mapStateToProps = createStructuredSelector({
   pg: selectPg,
-  fetching: selectIsPgFetching
+  isFetching: selectIsPgFetching
 });
 
 const mapDispatchToProps = dispatch => ({

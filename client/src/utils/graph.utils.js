@@ -35,4 +35,8 @@ export const getChartColor = (data)=>{
     return colorMapping
 }
 
+export const convertGraphData = (raw, percision)=>{
+    console.log(raw)
+}
+
 
