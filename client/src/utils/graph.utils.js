@@ -35,8 +35,32 @@ export const getChartColor = (data)=>{
     return colorMapping
 }
 
-export const convertGraphData = (raw, percision)=>{
-    console.log(raw)
+export const convertGraphData = (data,percision)=>{
+    console.log(data)
+    let graphingData = [];
+    let currentRange, maxRange;
+    let totalReading = [];
+    let interval;
+    for(let table in data){
+        totalReading = [...totalReading,...data[table]]
+    }
+    totalReading.sort((a,b)=>a-b)
+    currentRange = totalReading[0];
+    maxRange = totalReading[totalReading.length-1];
+    interval = parseFloat(parseFloat((totalReading[totalReading.length-1]-totalReading[0])/percision).toFixed(2));
+
+    while(currentRange < maxRange){
+        let temp = {};
+        temp['name'] = `${currentRange.toFixed(2)}-${(currentRange+interval).toFixed(2)}`
+        for(let table in data){
+            temp[table] = data[table].filter((el)=>el >=currentRange && el <= (currentRange+interval)).length
+        }
+        graphingData.push(temp)
+        currentRange += interval
+    }
+    console.log(graphingData)
+    return graphingData
+
 }
 
 

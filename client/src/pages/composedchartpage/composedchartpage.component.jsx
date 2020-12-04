@@ -22,21 +22,22 @@ const ComposedChartPage = ({fetchPgStart,pg,isFetching}) => {
     const initialState = {
       model: '',
       table: '',
-      testType: '',
+      testType: [],
       lowerSN: '',
       upperSN: '',
       range:[{
         startDate: '',
         endDate: '',
         key: 'selection'
-      }],
-      percision:3
+      }]
     }
     
     const [graphInfo, setgraphInfo] = useState(initialState);
     const [userTable, setUserTable] = useState({
       all:[],
-      selected:[]});
+      selected:[],
+      graphData:[],
+      percision:3});
 
 
   useEffect(() => {
@@ -75,50 +76,39 @@ const ComposedChartPage = ({fetchPgStart,pg,isFetching}) => {
     setgraphInfo({ ...graphInfo, ...info });
      
   }, [pg]);
-
-  const data = [
-    {
-      name: 'Page A', "FAN1(RPM)": 590, "FAN2(RPM)": 800, "FAN3(RPM)": 700,
-    },
-    {
-      name: 'Page B', "FAN1(RPM)": 868, "FAN2(RPM)": 967, "FAN3(RPM)": 800,
-    },
-    {
-      name: 'Page C', "FAN1(RPM)": 1397, "FAN2(RPM)": 1098, "FAN3(RPM)": 1200,
-    },
-    {
-      name: 'Page D', "FAN1(RPM)": 1480, "FAN2(RPM)": 1200, "FAN3(RPM)": 900,
-    },
-    {
-      name: 'Page E', "FAN1(RPM)": 1520, "FAN2(RPM)": 1108, "FAN3(RPM)": 1800,
-    },
-    {
-      name: 'Page F', "FAN1(RPM)": 1400, "FAN2(RPM)": 680, "FAN3(RPM)": 800,
-    },
-  ];
+  
   const handleSubmit = async event => {
     event.preventDefault();
    
-    // console.log(graphInfo)
-    console.log('----------')
+    
     const {model,
     table,
     testType,
     lowerSN,
-    upperSN,
-    percision} = graphInfo
+    upperSN} = graphInfo
     const startDate = formatDate(graphInfo['range'][0]['startDate']);
     const endDate = formatDate(graphInfo['range'][0]['endDate']);
     const tableName = model + "_" + table
+    let testTypeString = ""
+    if(testType.length === 1){
+      testTypeString = "AND test_type = '"+testType[0]+"'"
+    }else{
+      testTypeString = "AND test_type = '"+testType[0]+"'"
+      for(let i=1; i<testType.length; i++){
+        testTypeString += " OR test_type = '"+ testType[i]+"'"
+      }
+    }
 
-    console.log(model, table, testType, lowerSN,upperSN,startDate,endDate,percision)
     
 
     await fetchPgStart({title:tableName,
     query:`SELECT * FROM "${table}" WHERE test_date >= '${startDate}' AND test_date <= '${endDate}'
     AND serial_number >= '${lowerSN}' AND serial_number <= '${upperSN}' 
-    AND test_type = 'ITS' OR test_type = 'IQC' ORDER BY reading`,
+    ${testTypeString} ORDER BY reading`,
     database: model})
+    console.log(`SELECT * FROM "${table}" WHERE test_date >= '${startDate}' AND test_date <= '${endDate}'
+    AND serial_number >= '${lowerSN}' AND serial_number <= '${upperSN}' 
+    ${testTypeString} ORDER BY reading`)
     setUserTable({...userTable,all:[...userTable.all,tableName]})
     
   };
@@ -145,9 +135,14 @@ const ComposedChartPage = ({fetchPgStart,pg,isFetching}) => {
   };
 
   const handleGraph = () =>{
-    console.log(userTable)
+    
+    let raw = {};
+    for(let table of userTable.selected){
+      raw[table] = pg[table].map((el)=>el['reading'])
+    }
+    setUserTable({...userTable,graphData:convertGraphData(raw,userTable['percision'])})
 
-    // convertGraphData(pg[userTable[0]].map((el)=>el.reading),graphInfo['percision'])
+
   }
  
   
@@ -192,7 +187,7 @@ const ComposedChartPage = ({fetchPgStart,pg,isFetching}) => {
                   name="testType"
                   value={graphInfo['testType'].map((el)=>({value:el,label:el}))}
                   options={pg['databaseTestType'].map((el)=>({value:el['test_type'],label:el['test_type']}))}
-                  onChange={(el)=>handleChange({value:el.map(el=>el.value),name:'testType'})}
+                  onChange={(el)=>(el? handleChange({value:el.map(el=>el.value),name:'testType'}): handleChange({value:[],name:'testType'}))}
                   required
                   />
                   <FormInput
@@ -218,14 +213,6 @@ const ComposedChartPage = ({fetchPgStart,pg,isFetching}) => {
                   ranges={graphInfo['range']}
                   direction="horizontal"
                   />
-                  <FormSelect
-                  label='Percision'
-                  placeholder=""
-                  value={{value:graphInfo['percision'],label:graphInfo['percision']}}
-                  options={[...new Array(10).keys()].map(el=>({value:el+1,label:el+1}))}
-                  onChange={(el)=>handleChange({...el,name:'percision'})}
-                  required
-                  />
               
                 </div>
               :
@@ -242,7 +229,10 @@ const ComposedChartPage = ({fetchPgStart,pg,isFetching}) => {
       
       {
         graphInfo['table']?
+        !isFetching?
         < CustomButton type='submit'>Add to Graph</CustomButton>
+        :
+        <Spinner/>
         :
         <div/>
       }
@@ -260,13 +250,33 @@ const ComposedChartPage = ({fetchPgStart,pg,isFetching}) => {
                   onChange={(el)=>(el?setUserTable({...userTable,selected:el.map(el=>el.value)}):setUserTable({...userTable,selected:[]}))}
                   required
                   />
-          < CustomButton onClick={handleGraph}>Graph Selected</CustomButton>
+          <FormSelect
+                  label='Percision'
+                  placeholder=""
+                  value={{value:userTable['percision'],label:userTable['percision']}}
+                  options={[...new Array(10).keys()].map(el=>({value:el+1,label:el+1}))}
+                  onChange={(el)=>setUserTable({...userTable,percision:el.value})}
+                  required
+                  />
+          {
+            userTable.selected.length && ! isFetching?
+            < CustomButton onClick={handleGraph}>Graph Selected</CustomButton>
+            :
+            <div/>
+          }
+          
         </div>
         
         :
         <div/>
       }
-      <ComposedChartComponent data={data}/>
+      {
+        userTable['graphData'].length?
+        <ComposedChartComponent data={userTable['graphData']}/>
+        :
+        <div/>
+      }
+      
     </ComposedChartPageContainer>
     
   );

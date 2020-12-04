@@ -1,13 +1,19 @@
 import React from 'react'
-import { Area, Bar, ComposedChart, Line, CartesianGrid, XAxis, YAxis,Tooltip,Legend,Scatter } from 'recharts';
+import { Area, Bar, ComposedChart, Line, CartesianGrid, XAxis, YAxis,Tooltip,Legend,Scatter  } from 'recharts';
 import { ComposedChartContainer, Title} from './composed-chart.styles'
 import { getChartColor } from '../../utils/graph.utils'
 
 
+const renderTooltip = (props)=> {
+    console.log(props)
+    return (
+     <div>Custom content</div>
+    )
+  }
 
+const ComposedChartComponent = function(props){
 
-const ComposedChartComponent = function({data}){
-
+    const {data} = props
     //get sensor name
     const sensorNames = Object.keys(data[0]).filter((el)=>el !=='name')
     const graphingData = (getChartColor(sensorNames))
@@ -18,7 +24,7 @@ const ComposedChartComponent = function({data}){
         <ComposedChartContainer>
             <Title>Area Chart</Title>
             <ComposedChart
-                width={500}
+                width={1100}
                 height={400}
                 data={data}
                 margin={{
@@ -28,18 +34,18 @@ const ComposedChartComponent = function({data}){
                 <CartesianGrid stroke="#f5f5f5" />
                 <XAxis dataKey="name" />
                 <YAxis />
-                <Tooltip />
+                <Tooltip content={renderTooltip} />
                 <Legend />
                 {
                     graphingData.map((entry)=>{
                         return<Area key={entry.id} type="monotone" dataKey={entry.name} fill={entry.color}  stroke={entry.color} />
                     })
+                    
                 }
-            </ComposedChart>  
-
+            </ComposedChart>
             <Title>Bar Chart</Title>
             <ComposedChart
-                width={500}
+                width={1100}
                 height={400}
                 data={data}
                 margin={{
@@ -60,7 +66,7 @@ const ComposedChartComponent = function({data}){
 
             <Title>Line Chart</Title>
             <ComposedChart
-                width={500}
+                width={1100}
                 height={400}
                 data={data}
                 margin={{
@@ -81,7 +87,7 @@ const ComposedChartComponent = function({data}){
 
             <Title>Scatter Chart</Title>
             <ComposedChart
-                width={500}
+                width={1100}
                 height={400}
                 data={data}
                 margin={{

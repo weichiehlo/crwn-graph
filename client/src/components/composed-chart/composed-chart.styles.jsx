@@ -1,6 +1,5 @@
 import styled from 'styled-components';
 
-
 export const ComposedChartContainer = styled.div`
   display: flex;
   flex-direction: column;
