@@ -7,7 +7,7 @@ const Pool = require('pg').Pool
       user: 'postgres',
       host: 'localhost',
       database: database,
-      password: 'fortinet',
+      password: 'andy1314520',
       port: 5432,
     });
     return new Promise(function(resolve, reject) {
@@ -15,7 +15,10 @@ const Pool = require('pg').Pool
         if (error) {
           reject(error)
         }
-        resolve(results.rows);
+        results?
+        resolve(results.rows)
+        :
+        resolve([]);
       })
     }) 
   }

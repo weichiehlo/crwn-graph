@@ -5,7 +5,7 @@ import { getChartColor } from '../../utils/graph.utils'
 
 
 const renderTooltip = (props)=> {
-    console.log(props)
+    // console.log(props)
     return (
      <div>Custom content</div>
     )

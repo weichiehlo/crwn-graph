@@ -41,26 +41,63 @@ export const convertGraphData = (data,percision)=>{
     let currentRange, maxRange;
     let totalReading = [];
     let interval;
+    let digit = 0;
+
     for(let table in data){
         totalReading = [...totalReading,...data[table]]
     }
     totalReading.sort((a,b)=>a-b)
+    
     currentRange = totalReading[0];
     maxRange = totalReading[totalReading.length-1];
-    interval = parseFloat(parseFloat((totalReading[totalReading.length-1]-totalReading[0])/percision).toFixed(2));
+
+    let temp = 1;
+    let dif = maxRange-currentRange;
+    for(let i=0; i<5; i++){
+        if(temp > dif)
+        {
+            temp /= 10
+            digit++
+        }else{
+            break
+        }
+        
+    }
+    digit++
+    
+
+    interval = parseFloat(parseFloat((totalReading[totalReading.length-1]-totalReading[0])/percision).toFixed(digit));
+    
 
     while(currentRange < maxRange){
         let temp = {};
-        temp['name'] = `${currentRange.toFixed(2)}-${(currentRange+interval).toFixed(2)}`
+        temp['name'] = `${currentRange.toFixed(digit)}-${(currentRange+interval).toFixed(digit)}`
         for(let table in data){
             temp[table] = data[table].filter((el)=>el >=currentRange && el <= (currentRange+interval)).length
         }
         graphingData.push(temp)
         currentRange += interval
     }
-    console.log(graphingData)
+    
     return graphingData
 
+}
+
+export const compareUnit = (sensors,table)=>{
+    
+    let unit = table.find(el=>el['sensor_name'] === sensors[0])['unit']
+    try{
+        for(let sensor of sensors){
+            if(table.find(el=>el['sensor_name'] === sensor)['unit']!== unit){
+                return false
+            }
+        }
+        
+        return true
+    }catch{
+        return false
+    }
+    
 }
 
 

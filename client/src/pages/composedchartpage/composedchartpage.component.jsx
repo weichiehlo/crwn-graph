@@ -13,7 +13,7 @@ import 'react-date-range/dist/styles.css'; // main style file
 import 'react-date-range/dist/theme/default.css'; // theme css file
 import { DateRangePicker  } from 'react-date-range';
 import { formatDate } from '../../utils/inputs.utils'
-import { convertGraphData } from '../../utils/graph.utils'
+import { convertGraphData, compareUnit } from '../../utils/graph.utils'
 
 
 
@@ -37,7 +37,8 @@ const ComposedChartPage = ({fetchPgStart,pg,isFetching}) => {
       all:[],
       selected:[],
       graphData:[],
-      percision:3});
+      percision:3,
+      isSameUnit:true});
 
 
   useEffect(() => {
@@ -106,9 +107,6 @@ const ComposedChartPage = ({fetchPgStart,pg,isFetching}) => {
     AND serial_number >= '${lowerSN}' AND serial_number <= '${upperSN}' 
     ${testTypeString} ORDER BY reading`,
     database: model})
-    console.log(`SELECT * FROM "${table}" WHERE test_date >= '${startDate}' AND test_date <= '${endDate}'
-    AND serial_number >= '${lowerSN}' AND serial_number <= '${upperSN}' 
-    ${testTypeString} ORDER BY reading`)
     setUserTable({...userTable,all:[...userTable.all,tableName]})
     
   };
@@ -120,7 +118,7 @@ const ComposedChartPage = ({fetchPgStart,pg,isFetching}) => {
     switch(name){
       case 'model':
         if(graphInfo['table']) setgraphInfo({...initialState,'model':value});
-        await fetchPgStart({title:'databaseSensor', query:`SELECT sensor_name FROM "sensor_to_unit"`, database: value})
+        await fetchPgStart({title:'databaseSensor', query:`SELECT * FROM "sensor_to_unit"`, database: value})
         break;
       case 'table':
         await fetchPgStart({title:'databaseTestType', query:`SELECT DISTINCT (test_type) FROM "${value}"`, database: graphInfo['model']});
@@ -135,12 +133,16 @@ const ComposedChartPage = ({fetchPgStart,pg,isFetching}) => {
   };
 
   const handleGraph = () =>{
-    
     let raw = {};
     for(let table of userTable.selected){
       raw[table] = pg[table].map((el)=>el['reading'])
     }
-    setUserTable({...userTable,graphData:convertGraphData(raw,userTable['percision'])})
+    if(compareUnit(userTable.selected.map(el=>el.slice(7)),pg['databaseSensor'])){
+      setUserTable({...userTable,graphData:convertGraphData(raw,userTable['percision']),isSameUnit:true})
+    }else{
+      setUserTable({...userTable,isSameUnit:false})
+    }
+    
 
 
   }
@@ -264,7 +266,12 @@ const ComposedChartPage = ({fetchPgStart,pg,isFetching}) => {
             :
             <div/>
           }
-          
+          {
+            userTable.isSameUnit?
+            <div/>
+            :
+            <div>Please make sure the units are te same</div>
+          }
         </div>
         
         :
