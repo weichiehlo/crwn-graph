@@ -6,6 +6,7 @@ import { getChartColor } from '../../utils/graph.utils'
 
 const renderTooltip = (props)=> {
     // console.log(props)
+   
     return (
      <div>Custom content</div>
     )
@@ -13,10 +14,12 @@ const renderTooltip = (props)=> {
 
 const ComposedChartComponent = function(props){
 
-    const {data} = props
+    const {data,serialNumber} = props
     //get sensor name
     const sensorNames = Object.keys(data[0]).filter((el)=>el !=='name')
     const graphingData = (getChartColor(sensorNames))
+
+    console.log(serialNumber)
 
     
 

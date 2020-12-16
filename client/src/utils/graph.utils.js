@@ -36,20 +36,24 @@ export const getChartColor = (data)=>{
 }
 
 export const convertGraphData = (data,percision)=>{
-    console.log(data)
+
     let graphingData = [];
     let currentRange, maxRange;
     let totalReading = [];
     let interval;
     let digit = 0;
+    let serialNumber = {};
+
 
     for(let table in data){
-        totalReading = [...totalReading,...data[table]]
+        totalReading = [...totalReading,...data[table].map(el=>el['reading'])]
+        
     }
     totalReading.sort((a,b)=>a-b)
     
     currentRange = totalReading[0];
     maxRange = totalReading[totalReading.length-1];
+
 
     let temp = 1;
     let dif = maxRange-currentRange;
@@ -72,14 +76,23 @@ export const convertGraphData = (data,percision)=>{
     while(currentRange < maxRange){
         let temp = {};
         temp['name'] = `${currentRange.toFixed(digit)}-${(currentRange+interval).toFixed(digit)}`
+        
         for(let table in data){
-            temp[table] = data[table].filter((el)=>el >=currentRange && el <= (currentRange+interval)).length
+            serialNumber[table + "_" + temp['name']] = [];
+            temp[table] = 0;
+            for(let i=0; i<data[table].length;i++){
+                if(data[table][i]['reading']>=currentRange && data[table][i]['reading'] <= (currentRange+interval)){
+                    serialNumber[table + "_" + temp['name']].push(data[table][i]['serial_number']);
+                    temp[table]++;
+                }
+            }
         }
         graphingData.push(temp)
         currentRange += interval
     }
-    
-    return graphingData
+
+
+    return {processeData:graphingData,serialNumber:serialNumber}
 
 }
 
@@ -98,6 +111,10 @@ export const compareUnit = (sensors,table)=>{
         return false
     }
     
+}
+
+export const deleteDuplicate = (array) =>{
+    return [...new Set(array)]
 }
 
 

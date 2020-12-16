@@ -13,7 +13,7 @@ import 'react-date-range/dist/styles.css'; // main style file
 import 'react-date-range/dist/theme/default.css'; // theme css file
 import { DateRangePicker  } from 'react-date-range';
 import { formatDate } from '../../utils/inputs.utils'
-import { convertGraphData, compareUnit } from '../../utils/graph.utils'
+import { convertGraphData, compareUnit, deleteDuplicate } from '../../utils/graph.utils'
 
 
 
@@ -37,6 +37,7 @@ const ComposedChartPage = ({fetchPgStart,pg,isFetching}) => {
       all:[],
       selected:[],
       graphData:[],
+      serialNumber:{},
       percision:3,
       isSameUnit:true});
 
@@ -134,14 +135,22 @@ const ComposedChartPage = ({fetchPgStart,pg,isFetching}) => {
 
   const handleGraph = () =>{
     let raw = {};
+    let serialNumbers = {};
+    let unit = pg['databaseSensor'].find(el=>el['sensor_name'] === userTable.selected[0].slice(7))['unit']
     for(let table of userTable.selected){
-      raw[table] = pg[table].map((el)=>el['reading'])
+      unit = pg['databaseSensor'].find(el=>el['sensor_name'] === table.slice(7))['unit']
+      raw[`${table} (${unit})`] = pg[table].map((el)=>({reading:el['reading'],serial_number:el['serial_number']}))
+      serialNumbers[`${table} (${unit})`] = deleteDuplicate(pg[table].map((el)=>el['serial_number']))
     }
+
+    let graphData = convertGraphData(raw,userTable['percision']);
     if(compareUnit(userTable.selected.map(el=>el.slice(7)),pg['databaseSensor'])){
-      setUserTable({...userTable,graphData:convertGraphData(raw,userTable['percision']),isSameUnit:true})
+      setUserTable({...userTable,graphData:graphData.processeData,isSameUnit:true,serialNumber:graphData.serialNumber})
     }else{
       setUserTable({...userTable,isSameUnit:false})
     }
+
+
     
 
 
@@ -279,7 +288,7 @@ const ComposedChartPage = ({fetchPgStart,pg,isFetching}) => {
       }
       {
         userTable['graphData'].length?
-        <ComposedChartComponent data={userTable['graphData']}/>
+        <ComposedChartComponent data={userTable['graphData']} serialNumber={userTable['serialNumber']}/>
         :
         <div/>
       }
