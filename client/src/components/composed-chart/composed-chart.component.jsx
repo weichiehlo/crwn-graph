@@ -2,15 +2,10 @@ import React from 'react'
 import { Area, Bar, ComposedChart, Line, CartesianGrid, XAxis, YAxis,Tooltip,Legend,Scatter  } from 'recharts';
 import { ComposedChartContainer, Title} from './composed-chart.styles'
 import { getChartColor } from '../../utils/graph.utils'
+import  CoordinateInfo  from '../coordinate-info/coordinate-info.component'
 
 
-const renderTooltip = (props)=> {
-    // console.log(props)
-   
-    return (
-     <div>Custom content</div>
-    )
-  }
+
 
 const ComposedChartComponent = function(props){
 
@@ -20,6 +15,20 @@ const ComposedChartComponent = function(props){
     const graphingData = (getChartColor(sensorNames))
 
     console.log(serialNumber)
+    // const renderTooltip = (props)=> {
+    //     if(props['active']){
+        
+        
+    //     return (
+    //         props['payload'].map((el,id)=>(
+    //             <CoordinateInfo key={id} title ={el.dataKey} subtitle ={el.payload.name} value={el.payload[el.dataKey]} serialNumber={serialNumber[el.dataKey+"_"+el.payload.name]}/>
+    //         )
+    //         )
+            
+    //     )
+    //     }
+    //   }
+    // <Tooltip content={renderTooltip} />
 
     
 
@@ -37,7 +46,7 @@ const ComposedChartComponent = function(props){
                 <CartesianGrid stroke="#f5f5f5" />
                 <XAxis dataKey="name" />
                 <YAxis />
-                <Tooltip content={renderTooltip} />
+                <Tooltip/>
                 <Legend />
                 {
                     graphingData.map((entry)=>{
@@ -46,6 +55,15 @@ const ComposedChartComponent = function(props){
                     
                 }
             </ComposedChart>
+
+            {
+                Object.keys(serialNumber).map((el,id)=>(
+                    <CoordinateInfo key={id} title ={el} value={serialNumber[el].length} serialNumber={serialNumber[el]}/>
+                ))
+
+            }
+            
+
             <Title>Bar Chart</Title>
             <ComposedChart
                 width={1100}
@@ -65,7 +83,8 @@ const ComposedChartComponent = function(props){
                         return<Bar key={entry.id} type="monotone" dataKey={entry.name} fill={entry.color}  stroke={entry.color} />
                     })
                 }
-            </ComposedChart>  
+            </ComposedChart>                           
+            
 
             <Title>Line Chart</Title>
             <ComposedChart
