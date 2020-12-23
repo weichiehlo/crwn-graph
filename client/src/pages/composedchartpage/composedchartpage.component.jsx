@@ -133,7 +133,8 @@ const ComposedChartPage = ({fetchPgStart,pg,isFetching}) => {
 
   };
 
-  const handleGraph = () =>{
+  const handleGraph = (event) =>{
+    event.preventDefault()
     let raw = {};
     let serialNumbers = {};
     let unit = pg['databaseSensor'].find(el=>el['sensor_name'] === userTable.selected[0].slice(7))['unit']
@@ -250,7 +251,7 @@ const ComposedChartPage = ({fetchPgStart,pg,isFetching}) => {
       </FormContainer>
       {
         userTable['all'].length?
-        <div>
+        <FormContainer onSubmit={handleGraph}>
           <FormSelect
                   label='User Tables'
                   placeholder="Select Tables"
@@ -271,7 +272,7 @@ const ComposedChartPage = ({fetchPgStart,pg,isFetching}) => {
                   />
           {
             userTable.selected.length && ! isFetching?
-            < CustomButton onClick={handleGraph}>Graph Selected</CustomButton>
+            < CustomButton>Graph Selected</CustomButton>
             :
             <div/>
           }
@@ -281,7 +282,7 @@ const ComposedChartPage = ({fetchPgStart,pg,isFetching}) => {
             :
             <div>Please make sure the units are te same</div>
           }
-        </div>
+        </FormContainer>
         
         :
         <div/>

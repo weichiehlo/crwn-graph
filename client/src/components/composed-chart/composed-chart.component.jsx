@@ -1,11 +1,14 @@
-import React from 'react'
+import React, {useState,useEffect} from 'react'
 import { Area, Bar, ComposedChart, Line, CartesianGrid, XAxis, YAxis,Tooltip,Legend,Scatter  } from 'recharts';
 import { ComposedChartContainer, Title} from './composed-chart.styles'
 import { getChartColor } from '../../utils/graph.utils'
 import  CoordinateInfo  from '../coordinate-info/coordinate-info.component'
+import Checkbox from 'rc-checkbox';
 
 
-
+function onChange(e) {
+    console.log('Checkbox checked:', (e.target.checked));
+  }
 
 const ComposedChartComponent = function(props){
 
@@ -13,6 +16,7 @@ const ComposedChartComponent = function(props){
     //get sensor name
     const sensorNames = Object.keys(data[0]).filter((el)=>el !=='name')
     const graphingData = (getChartColor(sensorNames))
+    const [displaySN, setdisplaySN] = useState(false);
 
     console.log(serialNumber)
     // const renderTooltip = (props)=> {
@@ -56,10 +60,17 @@ const ComposedChartComponent = function(props){
                 }
             </ComposedChart>
 
+            <Checkbox
+                onChange={(event)=>setdisplaySN(event.target.checked)}
+              />
+
             {
+                displaySN?
                 Object.keys(serialNumber).map((el,id)=>(
                     <CoordinateInfo key={id} title ={el} value={serialNumber[el].length} serialNumber={serialNumber[el]}/>
                 ))
+                :
+                <div/>
 
             }
             
