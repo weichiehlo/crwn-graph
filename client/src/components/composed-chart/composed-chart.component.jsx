@@ -1,14 +1,10 @@
-import React, {useState,useEffect} from 'react'
+import React, {useState} from 'react'
 import { Area, Bar, ComposedChart, Line, CartesianGrid, XAxis, YAxis,Tooltip,Legend,Scatter  } from 'recharts';
-import { ComposedChartContainer, Title} from './composed-chart.styles'
+import { ComposedChartContainer, Title, RevealContainer,ChartSNContainer, ChartRevealContainer, ChartInfoContainer} from './composed-chart.styles'
 import { getChartColor } from '../../utils/graph.utils'
 import  CoordinateInfo  from '../coordinate-info/coordinate-info.component'
 import Checkbox from 'rc-checkbox';
 
-
-function onChange(e) {
-    console.log('Checkbox checked:', (e.target.checked));
-  }
 
 const ComposedChartComponent = function(props){
 
@@ -18,7 +14,6 @@ const ComposedChartComponent = function(props){
     const graphingData = (getChartColor(sensorNames))
     const [displaySN, setdisplaySN] = useState(false);
 
-    console.log(serialNumber)
     // const renderTooltip = (props)=> {
     //     if(props['active']){
         
@@ -39,40 +34,52 @@ const ComposedChartComponent = function(props){
     return(
         <ComposedChartContainer>
             <Title>Area Chart</Title>
-            <ComposedChart
-                width={1100}
-                height={400}
-                data={data}
-                margin={{
-                    top: 20, right: 20, bottom: 20, left: 20,
-                }}
-                >
-                <CartesianGrid stroke="#f5f5f5" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip/>
-                <Legend />
+            <ChartSNContainer>
+                <ChartRevealContainer>
+                    <ComposedChart
+                        width={1100}
+                        height={400}
+                        data={data}
+                        margin={{
+                            top: 20, right: 20, bottom: 20, left: 20,
+                        }}
+                        >
+                        <CartesianGrid stroke="#f5f5f5" />
+                        <XAxis dataKey="name" />
+                        <YAxis />
+                        <Tooltip/>
+                        <Legend />
+                        {
+                            graphingData.map((entry)=>{
+                                return<Area key={entry.id} type="monotone" dataKey={entry.name} fill={entry.color}  stroke={entry.color} />
+                            })
+                            
+                        }
+                    </ComposedChart>
+                    <RevealContainer>
+                        <span>Reveal SN</span>
+                        <Checkbox
+                            onChange={(event)=>setdisplaySN(event.target.checked)}
+                        />
+                    </RevealContainer>
+                </ChartRevealContainer>
+                <ChartInfoContainer>
                 {
-                    graphingData.map((entry)=>{
-                        return<Area key={entry.id} type="monotone" dataKey={entry.name} fill={entry.color}  stroke={entry.color} />
-                    })
-                    
+                    displaySN?
+                    Object.keys(serialNumber).map((el,id)=>(
+                        <CoordinateInfo key={id} title ={el} serialNumber={[...new Set(serialNumber[el])] } color={graphingData.find(sensor=>sensor.name === el.split('-').slice(0,el.split('-').length-2).join('-'))['color']}/>
+                    ))
+                    :
+                    <div/>
+    
                 }
-            </ComposedChart>
-
-            <Checkbox
-                onChange={(event)=>setdisplaySN(event.target.checked)}
-              />
-
-            {
-                displaySN?
-                Object.keys(serialNumber).map((el,id)=>(
-                    <CoordinateInfo key={id} title ={el} value={serialNumber[el].length} serialNumber={serialNumber[el]}/>
-                ))
-                :
-                <div/>
-
-            }
+                </ChartInfoContainer>
+                
+            
+            </ChartSNContainer>
+            
+            
+            
             
 
             <Title>Bar Chart</Title>

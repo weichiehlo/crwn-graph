@@ -78,11 +78,11 @@ export const convertGraphData = (data,percision)=>{
         temp['name'] = `${currentRange.toFixed(digit)}-${(currentRange+interval).toFixed(digit)}`
         
         for(let table in data){
-            serialNumber[table + "_" + temp['name']] = [];
+            serialNumber[table + "-" + temp['name']] = [];
             temp[table] = 0;
             for(let i=0; i<data[table].length;i++){
                 if(data[table][i]['reading']>=currentRange && data[table][i]['reading'] <= (currentRange+interval)){
-                    serialNumber[table + "_" + temp['name']].push(data[table][i]['serial_number']);
+                    serialNumber[table + "-" + temp['name']].push(data[table][i]['serial_number']);
                     temp[table]++;
                 }
             }

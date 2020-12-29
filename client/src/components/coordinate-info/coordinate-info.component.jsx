@@ -1,12 +1,27 @@
 import React from 'react';
 import {
-  ScrollContainer
+  ScrollContainer,
+  CoordinateInfoContainer,
+  InfoContainer,
+  Info
 } from './coordinate-info.styles';
 
-const CoordinateInfo = ({ title,  value, serialNumber}) => (
-  <div>
-    <h3>title:{title}</h3>
-    <h4>value:{value}</h4>
+const CoordinateInfo = ({ title, serialNumber, color}) => {
+
+
+  title = title.split('-');
+  let model = title[0],
+      sensor = title[1],
+      range = title[2]
+  
+
+  return(
+  <CoordinateInfoContainer>
+    <InfoContainer>
+      <Info color={color}>{model}</Info>
+      <Info color={color}>{sensor}</Info>
+      <Info color={color}>{range}</Info>
+    </InfoContainer>
     <ScrollContainer>
         {
           serialNumber.map((el,id)=>(
@@ -14,8 +29,8 @@ const CoordinateInfo = ({ title,  value, serialNumber}) => (
           ))
         }
     </ScrollContainer>
-  </div>
-);
+  </CoordinateInfoContainer>)
+  };
 
 
 export default CoordinateInfo

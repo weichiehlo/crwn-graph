@@ -18,5 +18,31 @@ export const Title = styled.h1`
   margin-bottom: 50px;
 `;
 
+export const RevealContainer = styled.div`
+ display: flex;
+ flex-direction: row;
+`;
+
+export const ChartRevealContainer = styled.div`
+ display: flex;
+ flex-direction: column;
+ justify-content: center;
+ align-items: center;
+`;
+
+export const ChartSNContainer = styled.div`
+ display: flex;
+ flex-direction: row;
+ align-items: center;
+ justify-content: center;
+ gap: 50px;
+`;
+
+export const ChartInfoContainer = styled.div`
+ display: flex;
+ flex-direction: row;
+ gap: 12px;
+`;
+
 
 

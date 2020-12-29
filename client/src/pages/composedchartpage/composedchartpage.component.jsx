@@ -90,7 +90,7 @@ const ComposedChartPage = ({fetchPgStart,pg,isFetching}) => {
     upperSN} = graphInfo
     const startDate = formatDate(graphInfo['range'][0]['startDate']);
     const endDate = formatDate(graphInfo['range'][0]['endDate']);
-    const tableName = model + "_" + table
+    const tableName = model + "-" + table
     let testTypeString = ""
     if(testType.length === 1){
       testTypeString = "AND test_type = '"+testType[0]+"'"
