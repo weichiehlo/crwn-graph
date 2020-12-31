@@ -9,6 +9,8 @@ export const ScrollContainer = styled.div`
 export const CoordinateInfoContainer = styled.div`
  display: flex;
  flex-direction: column;
+ border-left: solid grey 3px;
+ padding:20px;
 `;
 
 export const InfoContainer = styled.div`

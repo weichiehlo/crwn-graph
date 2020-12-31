@@ -231,7 +231,7 @@ const ComposedChartPage = ({fetchPgStart,pg,isFetching}) => {
               graphInfo['table']?
               <Spinner/>
               :
-              <div/>
+              <React.Fragment/>
             }
             
           </div>

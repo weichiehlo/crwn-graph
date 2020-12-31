@@ -1,5 +1,5 @@
 import React, {useState} from 'react'
-import { Area, Bar, ComposedChart, Line, CartesianGrid, XAxis, YAxis,Tooltip,Legend,Scatter  } from 'recharts';
+import { Area, Bar, ComposedChart, Line, CartesianGrid, XAxis, YAxis,Tooltip,Legend,Scatter,ReferenceLine  } from 'recharts';
 import { ComposedChartContainer, Title, RevealContainer,ChartSNContainer, ChartRevealContainer, ChartInfoContainer} from './composed-chart.styles'
 import { getChartColor } from '../../utils/graph.utils'
 import  CoordinateInfo  from '../coordinate-info/coordinate-info.component'
@@ -8,11 +8,12 @@ import Checkbox from 'rc-checkbox';
 
 const ComposedChartComponent = function(props){
 
-    const {data,serialNumber} = props
+    let {data,serialNumber} = props
     //get sensor name
     const sensorNames = Object.keys(data[0]).filter((el)=>el !=='name')
     const graphingData = (getChartColor(sensorNames))
     const [displaySN, setdisplaySN] = useState(false);
+
 
     // const renderTooltip = (props)=> {
     //     if(props['active']){
@@ -29,7 +30,14 @@ const ComposedChartComponent = function(props){
     //   }
     // <Tooltip content={renderTooltip} />
 
+    // to eliminate the empty serial number list
+    for(let point in serialNumber){
+        if(serialNumber[point].length === 0){
+            delete serialNumber[point]
+        }
+    }
     
+    console.log(data)
 
     return(
         <ComposedChartContainer>
@@ -48,6 +56,7 @@ const ComposedChartComponent = function(props){
                         <XAxis dataKey="name" />
                         <YAxis />
                         <Tooltip/>
+                        <ReferenceLine x= {data[2]['name']} stroke="green" label="Min PAGE" />
                         <Legend />
                         {
                             graphingData.map((entry)=>{
@@ -70,7 +79,7 @@ const ComposedChartComponent = function(props){
                         <CoordinateInfo key={id} title ={el} serialNumber={[...new Set(serialNumber[el])] } color={graphingData.find(sensor=>sensor.name === el.split('-').slice(0,el.split('-').length-2).join('-'))['color']}/>
                     ))
                     :
-                    <div/>
+                    <React.Fragment/>
     
                 }
                 </ChartInfoContainer>

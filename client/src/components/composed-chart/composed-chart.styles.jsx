@@ -42,6 +42,7 @@ export const ChartInfoContainer = styled.div`
  display: flex;
  flex-direction: row;
  gap: 12px;
+ padding: 20px;
 `;
 
 

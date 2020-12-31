@@ -43,18 +43,23 @@ export const convertGraphData = (data,percision)=>{
     let interval;
     let digit = 0;
     let serialNumber = {};
+    let sensorTotalCount = {};
 
+   
 
     for(let table in data){
-        totalReading = [...totalReading,...data[table].map(el=>el['reading'])]
-        
+        totalReading = [...totalReading,...data[table].map(el=>el['reading'])];
+        sensorTotalCount[table] = 0
     }
+
+
     totalReading.sort((a,b)=>a-b)
     
     currentRange = totalReading[0];
     maxRange = totalReading[totalReading.length-1];
 
 
+    //to decode the decimal place
     let temp = 1;
     let dif = maxRange-currentRange;
     for(let i=0; i<5; i++){
@@ -71,7 +76,7 @@ export const convertGraphData = (data,percision)=>{
     
 
     interval = parseFloat(parseFloat((totalReading[totalReading.length-1]-totalReading[0])/percision).toFixed(digit));
-    console.log(interval)
+  
     
 
     while(currentRange < maxRange){
@@ -85,11 +90,21 @@ export const convertGraphData = (data,percision)=>{
                 if(data[table][i]['reading']>=currentRange && data[table][i]['reading'] <= (currentRange+interval)){
                     serialNumber[table + "-" + temp['name']].push(data[table][i]['serial_number']);
                     temp[table]++;
+                    sensorTotalCount[table]++
                 }
             }
         }
         graphingData.push(temp)
         currentRange += interval
+    }
+
+
+    //convert the raw data into percentage
+    for(let point of graphingData){
+        console.log(point)
+        for(let table in sensorTotalCount){
+            point[table] = ((point[table] / sensorTotalCount[table])*100).toFixed(2)
+        }
     }
 
 
