@@ -14,3 +14,7 @@ export const ComposedChartPageContainer = styled.div`
   display: flex;
   flex-direction: column;
 `;
+
+export const Warning = styled.div`
+  color: red;
+`;

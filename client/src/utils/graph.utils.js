@@ -71,6 +71,7 @@ export const convertGraphData = (data,percision)=>{
     
 
     interval = parseFloat(parseFloat((totalReading[totalReading.length-1]-totalReading[0])/percision).toFixed(digit));
+    console.log(interval)
     
 
     while(currentRange < maxRange){

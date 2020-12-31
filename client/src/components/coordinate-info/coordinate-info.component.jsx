@@ -11,8 +11,8 @@ const CoordinateInfo = ({ title, serialNumber, color}) => {
 
   title = title.split('-');
   let model = title[0],
-      sensor = title[1],
-      range = title[2]
+      sensor = title.slice(1,title.length-2).join('-'),
+      range = title[title.length-2]+"-"+title[title.length-1]
   
 
   return(

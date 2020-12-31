@@ -1,6 +1,6 @@
 import React, {useState,useEffect} from 'react';
 import ComposedChartComponent from '../../components/composed-chart/composed-chart.component'
-import { FormContainer, ComposedChartPageContainer} from './composedchartpage.styles'
+import { FormContainer, ComposedChartPageContainer, Warning} from './composedchartpage.styles'
 import { FormInput, FormSelect} from '../../components/form-input/form-input.component';
 import CustomButton from '../../components/custom-button/custom-button.component';
 import { fetchPgStart } from '../../redux/pg/pg.actions'
@@ -280,7 +280,7 @@ const ComposedChartPage = ({fetchPgStart,pg,isFetching}) => {
             userTable.isSameUnit?
             <div/>
             :
-            <div>Please make sure the units are te same</div>
+            <Warning>Please make sure the units are the same</Warning>
           }
         </FormContainer>
         
