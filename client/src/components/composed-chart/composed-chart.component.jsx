@@ -1,6 +1,6 @@
 import React, {useState} from 'react'
 import { Area, Bar, ComposedChart, Line, CartesianGrid, XAxis, YAxis,Tooltip,Legend,Scatter,ReferenceLine  } from 'recharts';
-import { ComposedChartContainer, Title, RevealContainer,ChartSNContainer, ChartRevealContainer, ChartInfoContainer} from './composed-chart.styles'
+import { ComposedChartContainer, Title, RevealContainer,ChartSNContainer, ChartRevealContainer, ChartInfoContainer, AverageContainer, Average} from './composed-chart.styles'
 import { getChartColor } from '../../utils/graph.utils'
 import  CoordinateInfo  from '../coordinate-info/coordinate-info.component'
 import Checkbox from 'rc-checkbox';
@@ -8,7 +8,7 @@ import Checkbox from 'rc-checkbox';
 
 const ComposedChartComponent = function(props){
 
-    let {data,serialNumber} = props
+    let {data,serialNumber,average} = props
     //get sensor name
     const sensorNames = Object.keys(data[0]).filter((el)=>el !=='name')
     const graphingData = (getChartColor(sensorNames))
@@ -29,6 +29,7 @@ const ComposedChartComponent = function(props){
     //     }
     //   }
     // <Tooltip content={renderTooltip} />
+    //<ReferenceLine x= {data[2]['name']} stroke="green" label="Min PAGE" />
 
     // to eliminate the empty serial number list
     for(let point in serialNumber){
@@ -56,15 +57,23 @@ const ComposedChartComponent = function(props){
                         <XAxis dataKey="name" />
                         <YAxis />
                         <Tooltip/>
-                        <ReferenceLine x= {data[2]['name']} stroke="green" label="Min PAGE" />
                         <Legend />
                         {
                             graphingData.map((entry)=>{
-                                return<Area key={entry.id} type="monotone" dataKey={entry.name} fill={entry.color}  stroke={entry.color} />
+                                return<Area key={entry.id} type="monotone" dataKey={entry.name} fill={entry.color}  stroke={entry.color} unit="%"/>
                             })
                             
                         }
                     </ComposedChart>
+                    <AverageContainer>
+                        {
+                            graphingData.map((entry)=>{
+                                return<Average color= {entry.color} key={entry.id}> {entry.name} Average: {average[entry.name]} {entry.name.split(' ')[entry.name.split(' ').length-1]}</Average>
+                                
+                            })
+                            
+                        }
+                    </AverageContainer>
                     <RevealContainer>
                         <span>Reveal SN</span>
                         <Checkbox

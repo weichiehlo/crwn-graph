@@ -38,6 +38,7 @@ const ComposedChartPage = ({fetchPgStart,pg,isFetching}) => {
       selected:[],
       graphData:[],
       serialNumber:{},
+      average:{},
       percision:3,
       isSameUnit:true});
 
@@ -136,17 +137,16 @@ const ComposedChartPage = ({fetchPgStart,pg,isFetching}) => {
   const handleGraph = (event) =>{
     event.preventDefault()
     let raw = {};
-    let serialNumbers = {};
+    
     let unit = pg['databaseSensor'].find(el=>el['sensor_name'] === userTable.selected[0].slice(7))['unit']
     for(let table of userTable.selected){
       unit = pg['databaseSensor'].find(el=>el['sensor_name'] === table.slice(7))['unit']
       raw[`${table} (${unit})`] = pg[table].map((el)=>({reading:el['reading'],serial_number:el['serial_number']}))
-      serialNumbers[`${table} (${unit})`] = deleteDuplicate(pg[table].map((el)=>el['serial_number']))
     }
 
     let graphData = convertGraphData(raw,userTable['percision']);
     if(compareUnit(userTable.selected.map(el=>el.slice(7)),pg['databaseSensor'])){
-      setUserTable({...userTable,graphData:graphData.processeData,isSameUnit:true,serialNumber:graphData.serialNumber})
+      setUserTable({...userTable,graphData:graphData.processeData,isSameUnit:true,serialNumber:graphData.serialNumber,average:graphData.average})
     }else{
       setUserTable({...userTable,isSameUnit:false})
     }
@@ -289,7 +289,7 @@ const ComposedChartPage = ({fetchPgStart,pg,isFetching}) => {
       }
       {
         userTable['graphData'].length?
-        <ComposedChartComponent data={userTable['graphData']} serialNumber={userTable['serialNumber']}/>
+        <ComposedChartComponent data={userTable['graphData']} serialNumber={userTable['serialNumber'] } average={userTable['average']}/>
         :
         <div/>
       }

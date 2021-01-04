@@ -23,6 +23,13 @@ export const RevealContainer = styled.div`
  flex-direction: row;
 `;
 
+export const AverageContainer = styled.div`
+ display: flex;
+ flex-direction: row;
+ gap: 30px;
+ margin-bottom: 30px;
+`;
+
 export const ChartRevealContainer = styled.div`
  display: flex;
  flex-direction: column;
@@ -44,6 +51,10 @@ export const ChartInfoContainer = styled.div`
  gap: 12px;
  padding: 20px;
 `;
+
+export const Average = styled.span`
+ color:${props=>props.color};
+`
 
 
 

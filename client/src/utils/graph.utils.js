@@ -44,8 +44,7 @@ export const convertGraphData = (data,percision)=>{
     let digit = 0;
     let serialNumber = {};
     let sensorTotalCount = {};
-
-   
+    let average = {};
 
     for(let table in data){
         totalReading = [...totalReading,...data[table].map(el=>el['reading'])];
@@ -76,6 +75,10 @@ export const convertGraphData = (data,percision)=>{
     
 
     interval = parseFloat(parseFloat((totalReading[totalReading.length-1]-totalReading[0])/percision).toFixed(digit));
+
+    for(let reading in data){
+        average[reading] = (data[reading].reduce((a,el)=>a+el.reading,0)/data[reading].length).toFixed(digit)
+    }
   
     
 
@@ -108,7 +111,7 @@ export const convertGraphData = (data,percision)=>{
     }
 
 
-    return {processeData:graphingData,serialNumber:serialNumber}
+    return {processeData:graphingData,serialNumber:serialNumber,average:average}
 
 }
 
