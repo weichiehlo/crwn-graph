@@ -14,10 +14,13 @@ import 'react-date-range/dist/theme/default.css'; // theme css file
 import { DateRangePicker  } from 'react-date-range';
 import { formatDate } from '../../utils/inputs.utils'
 import { convertGraphData, compareUnit, deleteDuplicate } from '../../utils/graph.utils'
+import StateManager from 'react-select';
 
 
 
 const ComposedChartPage = ({fetchPgStart,pg,isFetching}) => {
+
+    const graphType = ['Area', 'Bar', 'Line', 'Scatter'];
 
     const initialState = {
       model: '',
@@ -40,6 +43,7 @@ const ComposedChartPage = ({fetchPgStart,pg,isFetching}) => {
       serialNumber:{},
       average:{},
       percision:3,
+      type:'Area',
       isSameUnit:true});
 
 
@@ -270,6 +274,14 @@ const ComposedChartPage = ({fetchPgStart,pg,isFetching}) => {
                   onChange={(el)=>setUserTable({...userTable,percision:el.value})}
                   required
                   />
+          <FormSelect
+                  label='graphType'
+                  placeholder=""
+                  value={{value:userTable['type'],label:userTable['type']}}
+                  options={graphType.map(el=>({value:el,label:el}))}
+                  onChange={(el)=>setUserTable({...userTable,type:el.value})}
+                  required
+                  />
           {
             userTable.selected.length && ! isFetching?
             < CustomButton>Graph Selected</CustomButton>
@@ -289,7 +301,7 @@ const ComposedChartPage = ({fetchPgStart,pg,isFetching}) => {
       }
       {
         userTable['graphData'].length?
-        <ComposedChartComponent data={userTable['graphData']} serialNumber={userTable['serialNumber'] } average={userTable['average']}/>
+        <ComposedChartComponent data={userTable['graphData']} serialNumber={userTable['serialNumber'] } average={userTable['average'] } type={userTable['type']}/>
         :
         <div/>
       }

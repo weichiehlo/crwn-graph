@@ -50,6 +50,8 @@ export const ChartInfoContainer = styled.div`
  flex-direction: row;
  gap: 12px;
  padding: 20px;
+ overflow-x: scroll;
+ width: 40%;
 `;
 
 export const Average = styled.span`

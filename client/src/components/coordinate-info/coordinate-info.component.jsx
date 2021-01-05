@@ -13,7 +13,9 @@ const CoordinateInfo = ({ title, serialNumber, color}) => {
   let model = title[0],
       sensor = title.slice(1,title.length-2).join('-'),
       range = title[title.length-2]+"-"+title[title.length-1]
-  
+
+  // to delete the unit from the table
+  sensor = sensor.slice(0,sensor.indexOf('('))
 
   return(
   <CoordinateInfoContainer>
