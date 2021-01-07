@@ -1,5 +1,5 @@
 import React, {useState} from 'react'
-import { Area, Bar, ComposedChart, Line, CartesianGrid, XAxis, YAxis,Tooltip,Legend,Scatter,ReferenceLine  } from 'recharts';
+import { Area, Bar, ComposedChart, Line, CartesianGrid, XAxis, YAxis,Tooltip,Legend,Scatter,PieChart, Pie, Cell, Sector, ReferenceLine  } from 'recharts';
 import { ComposedChartContainer, Title, RevealContainer,ChartSNContainer, ChartRevealContainer, ChartInfoContainer, AverageContainer, Average} from './composed-chart.styles'
 import { getChartColor } from '../../utils/graph.utils'
 import  CoordinateInfo  from '../coordinate-info/coordinate-info.component'
@@ -13,8 +13,8 @@ const ComposedChartComponent = function(props){
     const sensorNames = Object.keys(data[0]).filter((el)=>el !=='name')
     const graphingData = (getChartColor(sensorNames))
     const [displaySN, setdisplaySN] = useState(false);
-
-    console.log(type)
+  
+    
 
     // to eliminate the empty serial number list
     for(let point in serialNumber){
@@ -30,34 +30,37 @@ const ComposedChartComponent = function(props){
             <ChartSNContainer>
                 <ChartRevealContainer>
                     <ComposedChart
-                        width={1100}
-                        height={400}
-                        data={data}
-                        margin={{
-                            top: 20, right: 20, bottom: 20, left: 20,
-                        }}
-                        >
-                        <CartesianGrid stroke="#f5f5f5" />
-                        <XAxis dataKey="name" />
-                        <YAxis />
-                        <Tooltip/>
-                        <Legend />
-                        {
-                            graphingData.map((entry)=>{
-                                switch(type){
-                                    case 'Area':
-                                        return (<Area key={entry.id} type="monotone" dataKey={entry.name} fill={entry.color}  stroke={entry.color} unit="%"/>)
-                                    case 'Bar':
-                                        return (<Bar key={entry.id} type="monotone" dataKey={entry.name} fill={entry.color}  stroke={entry.color} unit="%"/>)
-                                    case 'Line': 
-                                        return (<Line key={entry.id} type="monotone" dataKey={entry.name} fill={entry.color}  stroke={entry.color} unit="%"/>)
-                                    case 'Scatter':
-                                        return (<Scatter key={entry.id} type="monotone" dataKey={entry.name} fill={entry.color}  stroke={entry.color} unit="%"/>)
-                                }
-                            })
-                            
-                        }
+                    width={1100}
+                    height={400}
+                    data={data}
+                    margin={{
+                        top: 20, right: 20, bottom: 20, left: 20,
+                    }}
+                    >
+                    <CartesianGrid stroke="#f5f5f5" />
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <Tooltip/>
+                    <Legend />
+                    {
+                        graphingData.map((entry)=>{
+                            switch(type){
+                                case 'Area':
+                                    return (<Area key={entry.id} type="monotone" dataKey={entry.name} fill={entry.color}  stroke={entry.color} unit="%"/>)
+                                case 'Bar':
+                                    return (<Bar key={entry.id} type="monotone" dataKey={entry.name} fill={entry.color}  stroke={entry.color} unit="%"/>)
+                                case 'Line': 
+                                    return (<Line key={entry.id} type="monotone" dataKey={entry.name} fill={entry.color}  stroke={entry.color} unit="%"/>)
+                                case 'Scatter':
+                                    return (<Scatter key={entry.id} type="monotone" dataKey={entry.name} fill={entry.color}  stroke={entry.color} unit="%"/>)
+                                default:
+                                    return (<div/>)
+                            }
+                        })
+                        
+                    }
                     </ComposedChart>
+
                     <AverageContainer>
                         {
                             graphingData.map((entry)=>{

@@ -132,8 +132,4 @@ export const compareUnit = (sensors,table)=>{
     
 }
 
-export const deleteDuplicate = (array) =>{
-    return [...new Set(array)]
-}
-
 

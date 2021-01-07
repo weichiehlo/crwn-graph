@@ -1,6 +1,6 @@
 import React, {useState,useEffect} from 'react';
-import ComposedChartComponent from '../../components/composed-chart/composed-chart.component'
-import { FormContainer, ComposedChartPageContainer, Warning} from './composedchartpage.styles'
+import PieChartComponent from '../../components/pie-chart/pie-chart.component'
+import { FormContainer, PieChartPageContainer, Warning} from './piechartpage.styles'
 import { FormInput, FormSelect} from '../../components/form-input/form-input.component';
 import CustomButton from '../../components/custom-button/custom-button.component';
 import { fetchPgStart } from '../../redux/pg/pg.actions'
@@ -18,9 +18,9 @@ import { convertGraphData, compareUnit } from '../../utils/graph.utils'
 
 
 
-const ComposedChartPage = ({fetchPgStart,pg,isFetching}) => {
+const PieChartPage = ({fetchPgStart,pg,isFetching}) => {
 
-    const graphType = ['Area', 'Bar', 'Line', 'Scatter'];
+    const graphType = ['Pie'];
 
     const initialState = {
       model: '',
@@ -43,7 +43,7 @@ const ComposedChartPage = ({fetchPgStart,pg,isFetching}) => {
       serialNumber:{},
       average:{},
       percision:3,
-      type:'Area',
+      type:'Pie',
       isSameUnit:true});
 
 
@@ -163,7 +163,7 @@ const ComposedChartPage = ({fetchPgStart,pg,isFetching}) => {
  
   
   return (
-    <ComposedChartPageContainer>
+    <PieChartPageContainer>
       <FormContainer onSubmit={handleSubmit}>
         {pg['databaseModel']?
           <FormSelect
@@ -301,12 +301,12 @@ const ComposedChartPage = ({fetchPgStart,pg,isFetching}) => {
       }
       {
         userTable['graphData'].length?
-        <ComposedChartComponent data={userTable['graphData']} serialNumber={userTable['serialNumber'] } average={userTable['average'] } type={userTable['type']}/>
+        <PieChartComponent data={userTable['graphData']} serialNumber={userTable['serialNumber'] } average={userTable['average'] } type={userTable['type']}/>
         :
         <div/>
       }
       
-    </ComposedChartPageContainer>
+    </PieChartPageContainer>
     
   );
 }
@@ -323,4 +323,4 @@ const mapDispatchToProps = dispatch => ({
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(ComposedChartPage);
+)(PieChartPage);

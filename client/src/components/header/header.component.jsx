@@ -26,6 +26,7 @@ const Header = ({ currentUser, hidden, signOutStart,stockNames}) => (
       <OptionLink to='/news'>NEWS</OptionLink>
       <OptionLink to='/prices'>PRICE</OptionLink>
       <OptionLink to='/composedchart'>COMPOSED CHART</OptionLink>
+      <OptionLink to='/piechart'>PIE CHART</OptionLink>
     </PagesNavContainer>
     <OptionsContainer>
       <OptionLink to='/checkout'>DONATE</OptionLink>

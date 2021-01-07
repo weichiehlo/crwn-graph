@@ -17,6 +17,7 @@ const PricePage = lazy (()=>import('./pages/pricepage/pricepage.component'))
 const SignInAndSignUpPage = lazy(()=>import('./pages/sign-in-and-sign-up/sign-in-and-sign-up.component'));
 const ContactPage = lazy(()=>import('./pages/contactpage/contact.component.jsx'));
 const ComposedChartPage = lazy(()=>import('./pages/composedchartpage/composedchartpage.component'))
+const PieChartPage = lazy(()=>import('./pages/piechartpage/piechartpage.component'))
 
 const App = ({ checkUserSession, currentUser }) => {
   useEffect(() => {
@@ -35,6 +36,7 @@ const App = ({ checkUserSession, currentUser }) => {
               <Route path='/prices' component={PricePage} />
               <Route path='/composedchart' component={ComposedChartPage} />
               <Route path='/contact' component={ContactPage} />
+              <Route path='/piechart' component={PieChartPage}/>
               <Route
                 exact
                 path='/signin'
