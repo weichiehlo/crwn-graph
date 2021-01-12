@@ -35,7 +35,7 @@ export const getChartColor = (data)=>{
     return colorMapping
 }
 
-export const convertGraphData = (data,percision)=>{
+export const convertGraphDataForComposed = (data,percision)=>{
 
     let graphingData = [];
     let currentRange, maxRange;
@@ -104,7 +104,6 @@ export const convertGraphData = (data,percision)=>{
 
     //convert the raw data into percentage
     for(let point of graphingData){
-        console.log(point)
         for(let table in sensorTotalCount){
             point[table] = ((point[table] / sensorTotalCount[table])*100).toFixed(2)
         }
@@ -112,6 +111,90 @@ export const convertGraphData = (data,percision)=>{
 
 
     return {processeData:graphingData,serialNumber:serialNumber,average:average}
+
+}
+
+export const convertGraphDataForPie = (data,percision)=>{
+
+    let graphingData = [];
+    let currentRange, maxRange;
+    let totalReading = [];
+    let interval;
+    let digit = 0;
+    let serialNumber = {};
+    let sensorTotalCount = {};
+    let average = {};
+
+    for(let table in data){
+        totalReading = [...totalReading,...data[table].map(el=>el['reading'])];
+        sensorTotalCount[table] = 0
+    }
+
+
+    totalReading.sort((a,b)=>a-b)
+    
+    currentRange = totalReading[0];
+    maxRange = totalReading[totalReading.length-1];
+
+
+    //to decode the decimal place
+    let temp = 1;
+    let dif = maxRange-currentRange;
+    for(let i=0; i<5; i++){
+        if(temp > dif)
+        {
+            temp /= 10
+            digit++
+        }else{
+            break
+        }
+        
+    }
+    digit++
+    
+
+    interval = parseFloat(parseFloat((totalReading[totalReading.length-1]-totalReading[0])/percision).toFixed(digit));
+
+    for(let reading in data){
+        average[reading] = (data[reading].reduce((a,el)=>a+el.reading,0)/data[reading].length).toFixed(digit)
+    }
+  
+    
+
+    while(currentRange < maxRange){
+        let temp = {};
+        temp['name'] = `${currentRange.toFixed(digit)}-${(currentRange+interval).toFixed(digit)}`
+        
+        for(let table in data){
+            serialNumber[table + "-" + temp['name']] = [];
+            temp[table] = 0;
+            for(let i=0; i<data[table].length;i++){
+                if(data[table][i]['reading']>=currentRange && data[table][i]['reading'] <= (currentRange+interval)){
+                    serialNumber[table + "-" + temp['name']].push(data[table][i]['serial_number']);
+                    temp[table]++;
+                    sensorTotalCount[table]++
+                }
+            }
+        }
+        graphingData.push(temp)
+        currentRange += interval
+    }
+
+    //convert the data for pie
+    const sensorList = Object.keys(graphingData[0]).filter(el=>el !== 'name');
+    let pieGraphingData = {};
+    for(let sensor of sensorList){
+        pieGraphingData[sensor] = []
+    }
+    for(let interval of graphingData){
+        for(let sensor of sensorList){
+            pieGraphingData[sensor].push({name:interval['name'], value:interval[sensor]})
+        }
+    }
+
+    console.log({processeData:pieGraphingData,serialNumber:serialNumber,average:average})
+
+    return {processeData:pieGraphingData,serialNumber:serialNumber,average:average}
 
 }
 

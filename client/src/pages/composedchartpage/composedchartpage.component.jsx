@@ -13,7 +13,7 @@ import 'react-date-range/dist/styles.css'; // main style file
 import 'react-date-range/dist/theme/default.css'; // theme css file
 import { DateRangePicker  } from 'react-date-range';
 import { formatDate } from '../../utils/inputs.utils'
-import { convertGraphData, compareUnit } from '../../utils/graph.utils'
+import { convertGraphDataForComposed, compareUnit } from '../../utils/graph.utils'
 
 
 
@@ -148,7 +148,7 @@ const ComposedChartPage = ({fetchPgStart,pg,isFetching}) => {
       raw[`${table} (${unit})`] = pg[table].map((el)=>({reading:el['reading'],serial_number:el['serial_number']}))
     }
 
-    let graphData = convertGraphData(raw,userTable['percision']);
+    let graphData = convertGraphDataForComposed(raw,userTable['percision']);
     if(compareUnit(userTable.selected.map(el=>el.slice(7)),pg['databaseSensor'])){
       setUserTable({...userTable,graphData:graphData.processeData,isSameUnit:true,serialNumber:graphData.serialNumber,average:graphData.average})
     }else{

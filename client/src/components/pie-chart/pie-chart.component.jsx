@@ -8,9 +8,11 @@ import Checkbox from 'rc-checkbox';
 
 const PieChartComponent = function(props){
 
+    console.log(props)
+
     let {data,serialNumber,average,type} = props
     //get sensor name
-    const sensorNames = Object.keys(data[0]).filter((el)=>el !=='name')
+    const sensorNames = Object.keys(data)
     const graphingData = (getChartColor(sensorNames))
     const [displaySN, setdisplaySN] = useState(false);
     const [activeIndex, setactiveIndex] = useState(1);
@@ -45,6 +47,11 @@ const PieChartComponent = function(props){
     const ex = mx + (cos >= 0 ? 1 : -1) * 22;
     const ey = my;
     const textAnchor = cos >= 0 ? 'start' : 'end';
+
+
+    console.log(data5)
+    console.log('---------')
+    console.log(data)
     
     return (
         <g>
@@ -87,14 +94,14 @@ const PieChartComponent = function(props){
                 <ChartRevealContainer>
     
                         {
-                            graphingData.map((entry)=>{
+                            Object.keys(data).map((entry,index)=>{
                                 switch(type){
                                     case 'Pie':
-                                        return (<PieChart width={800} height={400}>
+                                        return (<PieChart width={800} height={400} key={index}>
                                             <Pie 
                                                 activeIndex={activeIndex}
                                                 activeShape={renderActiveShape} 
-                                                data={data5} 
+                                                data={data[entry]} 
                                                 cx={300} 
                                                 cy={200} 
                                                 innerRadius={60}
@@ -104,7 +111,7 @@ const PieChartComponent = function(props){
                                                 dataKey="value"
                                             >
                                             {
-                                                data5.map((entry, index) => <Cell fill={COLORS[index % COLORS.length]}/>)
+                                                data[entry].map((entry, index) => <Cell fill={COLORS[index % COLORS.length] } key={index}/>)
                                             }
                                             </Pie>
                                             </PieChart>)

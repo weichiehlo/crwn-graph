@@ -13,7 +13,7 @@ import 'react-date-range/dist/styles.css'; // main style file
 import 'react-date-range/dist/theme/default.css'; // theme css file
 import { DateRangePicker  } from 'react-date-range';
 import { formatDate } from '../../utils/inputs.utils'
-import { convertGraphData, compareUnit } from '../../utils/graph.utils'
+import { convertGraphDataForPie, compareUnit } from '../../utils/graph.utils'
 
 
 
@@ -39,7 +39,7 @@ const PieChartPage = ({fetchPgStart,pg,isFetching}) => {
     const [userTable, setUserTable] = useState({
       all:[],
       selected:[],
-      graphData:[],
+      graphData:{},
       serialNumber:{},
       average:{},
       percision:3,
@@ -148,7 +148,7 @@ const PieChartPage = ({fetchPgStart,pg,isFetching}) => {
       raw[`${table} (${unit})`] = pg[table].map((el)=>({reading:el['reading'],serial_number:el['serial_number']}))
     }
 
-    let graphData = convertGraphData(raw,userTable['percision']);
+    let graphData = convertGraphDataForPie(raw,userTable['percision']);
     if(compareUnit(userTable.selected.map(el=>el.slice(7)),pg['databaseSensor'])){
       setUserTable({...userTable,graphData:graphData.processeData,isSameUnit:true,serialNumber:graphData.serialNumber,average:graphData.average})
     }else{
@@ -300,7 +300,7 @@ const PieChartPage = ({fetchPgStart,pg,isFetching}) => {
         <div/>
       }
       {
-        userTable['graphData'].length?
+        Object.keys(userTable['graphData']).length?
         <PieChartComponent data={userTable['graphData']} serialNumber={userTable['serialNumber'] } average={userTable['average'] } type={userTable['type']}/>
         :
         <div/>
