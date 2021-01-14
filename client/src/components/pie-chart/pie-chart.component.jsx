@@ -1,14 +1,12 @@
 import React, {useState} from 'react'
 import { Area, Bar, ComposedChart, Line, CartesianGrid, XAxis, YAxis,Tooltip,Legend,Scatter,PieChart, Pie, Cell, Sector, ReferenceLine  } from 'recharts';
-import { PieChartContainer, Title, RevealContainer,ChartSNContainer, ChartRevealContainer, ChartInfoContainer, AverageContainer, Average} from './pie-chart.styles'
+import { PieChartContainer, Title, RevealContainer,ChartSNContainer, ChartRevealContainer, ChartInfoContainer, GraphTitle, Average} from './pie-chart.styles'
 import { getChartColor } from '../../utils/graph.utils'
 import  CoordinateInfo  from '../coordinate-info/coordinate-info.component'
 import Checkbox from 'rc-checkbox';
 
 
 const PieChartComponent = function(props){
-
-    console.log(props)
 
     let {data,serialNumber,average,type} = props
     //get sensor name
@@ -32,8 +30,6 @@ const PieChartComponent = function(props){
 
     //Pie Calculation
     const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
-    const data5 = [{name: 'Group As', value: 7}, {name: 'Group Bs', value: 15},
-                  {name: 'Group Cs', value: 30}, {name: 'Group Ds', value: 21}, {name: 'Group SSs', value: 210}];
     const renderActiveShape = (props) => {
     const RADIAN = Math.PI / 180;
     const { cx, cy, midAngle, innerRadius, outerRadius, startAngle, endAngle,
@@ -47,11 +43,6 @@ const PieChartComponent = function(props){
     const ex = mx + (cos >= 0 ? 1 : -1) * 22;
     const ey = my;
     const textAnchor = cos >= 0 ? 'start' : 'end';
-
-
-    console.log(data5)
-    console.log('---------')
-    console.log(data)
     
     return (
         <g>
@@ -97,7 +88,10 @@ const PieChartComponent = function(props){
                             Object.keys(data).map((entry,index)=>{
                                 switch(type){
                                     case 'Pie':
-                                        return (<PieChart width={800} height={400} key={index}>
+                                        return (
+                                            <div>
+                                            <GraphTitle color= {graphingData[index].color}>{entry}</GraphTitle>
+                                            <PieChart width={800} height={400} key={index}>
                                             <Pie 
                                                 activeIndex={activeIndex}
                                                 activeShape={renderActiveShape} 
@@ -114,7 +108,10 @@ const PieChartComponent = function(props){
                                                 data[entry].map((entry, index) => <Cell fill={COLORS[index % COLORS.length] } key={index}/>)
                                             }
                                             </Pie>
-                                            </PieChart>)
+                                            </PieChart>
+                                            <Average color= {graphingData[index].color} key={index}> {graphingData[index].name.slice(0,graphingData[index].name.indexOf('('))} Average: {average[graphingData[index].name]} {graphingData[index].name.split(' ')[graphingData[index].name.split(' ').length-1]}</Average>
+                                            </div>)
+                                            
                                     case 'Bar':
                                         return (<Bar key={entry.id} type="monotone" dataKey={entry.name} fill={entry.color}  stroke={entry.color} unit="%"/>)
                                     case 'Line': 
@@ -128,16 +125,6 @@ const PieChartComponent = function(props){
                             
                         }
                         
-
-                    <AverageContainer>
-                        {
-                            graphingData.map((entry)=>{
-                                return<Average color= {entry.color} key={entry.id}> {entry.name.slice(0,entry.name.indexOf('('))} Average: {average[entry.name]} {entry.name.split(' ')[entry.name.split(' ').length-1]}</Average>
-                                
-                            })
-                            
-                        }
-                    </AverageContainer>
                     <RevealContainer>
                         <span>Reveal SN</span>
                         <Checkbox
