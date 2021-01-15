@@ -1,9 +1,10 @@
 import React, {useState} from 'react'
-import { Area, Bar, ComposedChart, Line, CartesianGrid, XAxis, YAxis,Tooltip,Legend,Scatter,PieChart, Pie, Cell, Sector, ReferenceLine  } from 'recharts';
-import { PieChartContainer, Title, RevealContainer,ChartSNContainer, ChartRevealContainer, ChartInfoContainer, GraphTitle, Average} from './pie-chart.styles'
+import { Area, Bar, ComposedChart, Line, CartesianGrid, XAxis, YAxis,Tooltip,Legend,Scatter,PieChart, Pie, Cell, Sector  } from 'recharts';
+import { PieChartContainer, Title, RevealContainer,ChartSNContainer, ChartRevealContainer, ChartInfoContainer, GraphTitle, Average, SinglePieContainer, GraphContainer} from './pie-chart.styles'
 import { getChartColor } from '../../utils/graph.utils'
 import  CoordinateInfo  from '../coordinate-info/coordinate-info.component'
 import Checkbox from 'rc-checkbox';
+import * as d3 from 'd3-scale-chromatic'
 
 
 const PieChartComponent = function(props){
@@ -29,7 +30,7 @@ const PieChartComponent = function(props){
     }
 
     //Pie Calculation
-    const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+    const COLORS = d3.schemeSet3;
     const renderActiveShape = (props) => {
     const RADIAN = Math.PI / 180;
     const { cx, cy, midAngle, innerRadius, outerRadius, startAngle, endAngle,
@@ -46,7 +47,7 @@ const PieChartComponent = function(props){
     
     return (
         <g>
-        <text x={cx} y={cy} dy={8} textAnchor="middle" fill={fill}>{payload.name}</text>
+        <text x={cx} y={cy} dy={8} textAnchor="middle" fill={fill} fontSize="30px">{payload.name}</text>
         <Sector
             cx={cx}
             cy={cy}
@@ -89,17 +90,18 @@ const PieChartComponent = function(props){
                                 switch(type){
                                     case 'Pie':
                                         return (
-                                            <div>
+                                            <SinglePieContainer>
                                             <GraphTitle color= {graphingData[index].color}>{entry}</GraphTitle>
-                                            <PieChart width={800} height={400} key={index}>
+                                            <GraphContainer>
+                                            <PieChart width={800} height={800} key={index}>
                                             <Pie 
                                                 activeIndex={activeIndex}
                                                 activeShape={renderActiveShape} 
                                                 data={data[entry]} 
-                                                cx={300} 
-                                                cy={200} 
-                                                innerRadius={60}
-                                                outerRadius={80} 
+                                                cx={400} 
+                                                cy={400} 
+                                                innerRadius={120}
+                                                outerRadius={160} 
                                                 fill="#cfb997"
                                                 onMouseEnter={onPieEnter}
                                                 dataKey="value"
@@ -109,8 +111,9 @@ const PieChartComponent = function(props){
                                             }
                                             </Pie>
                                             </PieChart>
+                                            </GraphContainer>
                                             <Average color= {graphingData[index].color} key={index}> {graphingData[index].name.slice(0,graphingData[index].name.indexOf('('))} Average: {average[graphingData[index].name]} {graphingData[index].name.split(' ')[graphingData[index].name.split(' ').length-1]}</Average>
-                                            </div>)
+                                            </SinglePieContainer>)
                                             
                                     case 'Bar':
                                         return (<Bar key={entry.id} type="monotone" dataKey={entry.name} fill={entry.color}  stroke={entry.color} unit="%"/>)

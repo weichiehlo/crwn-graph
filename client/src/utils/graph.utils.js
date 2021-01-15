@@ -1,4 +1,3 @@
-
 import * as d3 from 'd3-scale-chromatic'
 const calculatePoint = (i, intervalSize, colorRangeInfo) =>{
     let { colorStart, colorEnd, useEndAsStart } = colorRangeInfo;

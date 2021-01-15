@@ -32,7 +32,7 @@ export const ChartRevealContainer = styled.div`
 
 export const ChartSNContainer = styled.div`
  display: flex;
- flex-direction: row;
+ flex-direction: column;
  align-items: center;
  justify-content: center;
  gap: 50px;
@@ -55,5 +55,17 @@ export const GraphTitle = styled.h2`
  color:${props=>props.color};
 `
 
+export const SinglePieContainer = styled.div`
+ display: flex;
+ flex-direction: row;
+ align-items: center;
+ justify-content: center;
+ gap: 50px;
+`;
+
+export const GraphContainer = styled.div`
+  background-color: #CDCBCB ;
+  box-shadow: 0 0 8px 8px white inset;
+`;
 
 
