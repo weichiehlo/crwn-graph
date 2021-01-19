@@ -64,8 +64,7 @@ export const SinglePieContainer = styled.div`
 `;
 
 export const GraphContainer = styled.div`
-  background-color: #CDCBCB ;
-  box-shadow: 0 0 8px 8px white inset;
+
 `;
 
 

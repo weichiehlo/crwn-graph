@@ -30,9 +30,23 @@ const PieChartComponent = function(props){
     }
 
     //Pie Calculation
-    const COLORS = d3.schemeSet3;
-    const renderActiveShape = (props) => {
+    const COLORS = d3.schemePaired ;
     const RADIAN = Math.PI / 180;
+
+    const renderCustomizedLabel = (props) => {
+    const { cx, cy, midAngle, innerRadius, outerRadius, percent, index, name } = props
+    const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+     const x  = cx + radius * Math.cos(-midAngle * RADIAN);
+     const y = cy  + radius * Math.sin(-midAngle * RADIAN);
+    
+     return (
+       <text x={x} y={y} fill="white" textAnchor={x > cx ? 'start' : 'end'} 	dominantBaseline="central">
+           {`${name}: ${(percent * 100).toFixed(0)}%`}
+       </text>
+     );
+   };
+
+    const renderActiveShape = (props) => {
     const { cx, cy, midAngle, innerRadius, outerRadius, startAngle, endAngle,
         fill, payload, percent, value } = props;
     const sin = Math.sin(-RADIAN * midAngle);
@@ -88,9 +102,9 @@ const PieChartComponent = function(props){
                         {
                             Object.keys(data).map((entry,index)=>{
                                 switch(type){
-                                    case 'Pie':
+                                    case 'Pie(Interactive)':
                                         return (
-                                            <SinglePieContainer>
+                                            <SinglePieContainer key={index}>
                                             <GraphTitle color= {graphingData[index].color}>{entry}</GraphTitle>
                                             <GraphContainer>
                                             <PieChart width={800} height={800} key={index}>
@@ -115,12 +129,31 @@ const PieChartComponent = function(props){
                                             <Average color= {graphingData[index].color} key={index}> {graphingData[index].name.slice(0,graphingData[index].name.indexOf('('))} Average: {average[graphingData[index].name]} {graphingData[index].name.split(' ')[graphingData[index].name.split(' ').length-1]}</Average>
                                             </SinglePieContainer>)
                                             
-                                    case 'Bar':
-                                        return (<Bar key={entry.id} type="monotone" dataKey={entry.name} fill={entry.color}  stroke={entry.color} unit="%"/>)
-                                    case 'Line': 
-                                        return (<Line key={entry.id} type="monotone" dataKey={entry.name} fill={entry.color}  stroke={entry.color} unit="%"/>)
-                                    case 'Scatter':
-                                        return (<Scatter key={entry.id} type="monotone" dataKey={entry.name} fill={entry.color}  stroke={entry.color} unit="%"/>)
+                                    case 'Pie(Simple)':
+                                        return (
+                                            <SinglePieContainer key={index}>
+                                            <GraphTitle color= {graphingData[index].color}>{entry}</GraphTitle>
+                                            <GraphContainer>
+                                            <PieChart width={800} height={800}>
+                                                <Pie
+                                                data={data[entry]} 
+                                                cx={400} 
+                                                cy={400} 
+                                                labelLine={false}
+                                                label={renderCustomizedLabel}
+                                                outerRadius={200} 
+                                                fill="#8884d8"
+                                                dataKey="value"
+                                                >
+                                                    {
+                                                        data[entry].map((entry, index) => <Cell fill={COLORS[index % COLORS.length] } key={index}/>)
+                                                }
+                                                </Pie>
+                                            </PieChart>
+                                            </GraphContainer>
+                                            <Average color= {graphingData[index].color} key={index}> {graphingData[index].name.slice(0,graphingData[index].name.indexOf('('))} Average: {average[graphingData[index].name]} {graphingData[index].name.split(' ')[graphingData[index].name.split(' ').length-1]}</Average>
+                                            </SinglePieContainer>)
+                                        
                                     default:
                                         return (<div/>)
                                 }

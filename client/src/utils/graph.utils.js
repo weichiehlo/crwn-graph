@@ -191,8 +191,6 @@ export const convertGraphDataForPie = (data,percision)=>{
         }
     }
 
-    console.log({processeData:pieGraphingData,serialNumber:serialNumber,average:average})
-
     return {processeData:pieGraphingData,serialNumber:serialNumber,average:average}
 
 }

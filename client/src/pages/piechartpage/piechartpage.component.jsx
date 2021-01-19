@@ -20,7 +20,7 @@ import { convertGraphDataForPie, compareUnit } from '../../utils/graph.utils'
 
 const PieChartPage = ({fetchPgStart,pg,isFetching}) => {
 
-    const graphType = ['Pie'];
+    const graphType = ['Pie(Interactive)','Pie(Simple)'];
 
     const initialState = {
       model: '',
@@ -43,7 +43,7 @@ const PieChartPage = ({fetchPgStart,pg,isFetching}) => {
       serialNumber:{},
       average:{},
       percision:3,
-      type:'Pie',
+      type:'Pie(Simple)',
       isSameUnit:true});
 
 
