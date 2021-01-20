@@ -100,10 +100,11 @@ const PieChartPage = ({fetchPgStart,pg,isFetching}) => {
     if(testType.length === 1){
       testTypeString = "AND test_type = '"+testType[0]+"'"
     }else{
-      testTypeString = "AND test_type = '"+testType[0]+"'"
+      testTypeString = "AND (test_type = '"+testType[0]+"'"
       for(let i=1; i<testType.length; i++){
         testTypeString += " OR test_type = '"+ testType[i]+"'"
       }
+      testTypeString += ")"
     }
 
     

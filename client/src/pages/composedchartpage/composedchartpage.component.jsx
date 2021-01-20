@@ -100,13 +100,12 @@ const ComposedChartPage = ({fetchPgStart,pg,isFetching}) => {
     if(testType.length === 1){
       testTypeString = "AND test_type = '"+testType[0]+"'"
     }else{
-      testTypeString = "AND test_type = '"+testType[0]+"'"
+      testTypeString = "AND (test_type = '"+testType[0]+"'"
       for(let i=1; i<testType.length; i++){
         testTypeString += " OR test_type = '"+ testType[i]+"'"
       }
+      testTypeString += ")"
     }
-
-    
 
     await fetchPgStart({title:tableName,
     query:`SELECT * FROM "${table}" WHERE test_date >= '${startDate}' AND test_date <= '${endDate}'
@@ -132,6 +131,7 @@ const ComposedChartPage = ({fetchPgStart,pg,isFetching}) => {
         await fetchPgStart({title:'databaseMaxSN', query:`SELECT MAX (serial_number) FROM "${value}"`, database: graphInfo['model']});
         await fetchPgStart({title:'databaseMinDate', query:`SELECT MIN (test_date) FROM "${value}"`, database: graphInfo['model']});
         await fetchPgStart({title:'databaseMaxDate', query:`SELECT MAX (test_date) FROM "${value}"`, database: graphInfo['model']});
+
         break;
         default:
     }
@@ -139,6 +139,7 @@ const ComposedChartPage = ({fetchPgStart,pg,isFetching}) => {
   };
 
   const handleGraph = (event) =>{
+
     event.preventDefault()
     let raw = {};
     
