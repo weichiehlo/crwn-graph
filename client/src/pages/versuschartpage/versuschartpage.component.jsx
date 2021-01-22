@@ -13,7 +13,7 @@ import 'react-date-range/dist/styles.css'; // main style file
 import 'react-date-range/dist/theme/default.css'; // theme css file
 import { DateRangePicker  } from 'react-date-range';
 import { formatDate } from '../../utils/inputs.utils'
-import { convertGraphDataForComposed, compareUnit } from '../../utils/graph.utils'
+import { convertGraphDataForVersus } from '../../utils/graph.utils'
 
 
 
@@ -111,7 +111,7 @@ const VersusChartPage = ({fetchPgStart,pg,isFetching}) => {
 
   
     await fetchPgStart({title:tableName,
-    query:`SELECT "${xTable}".serial_number,"${xTable}".reading AS "X_reading","${yTable}".reading AS "Y_reading"
+    query:`SELECT "${xTable}".reading AS "X_reading","${yTable}".reading AS "Y_reading"
     FROM "${xTable}" INNER JOIN "${yTable}" ON "${xTable}".serial_number = "${yTable}".serial_number
     AND "${xTable}".ref_line_number = "${yTable}".ref_line_number
     AND "${xTable}".test_date = "${yTable}".test_date 
@@ -147,10 +147,31 @@ const VersusChartPage = ({fetchPgStart,pg,isFetching}) => {
 
   const handleGraph = (event) =>{
 
-    event.preventDefault()
+    event.preventDefault(userTable['percision'])
 
-    console.log(pg)
-    // let raw = {};
+    
+    let raw = {};
+    let xUnit, yUnit;
+    for(let table of userTable.selected){
+      raw[table] = pg[table]
+    }
+
+    console.log(raw)
+
+    let graphData = convertGraphDataForVersus(raw,userTable['percision']);
+    
+
+    for(let table of userTable.selected){
+
+      xUnit = pg['databaseSensor'].find(el=>el['sensor_name'] === table.split(" vs ")[0].slice(7))['unit']
+      yUnit = pg['databaseSensor'].find(el=>el['sensor_name'] === table.split(" vs ")[1])['unit']
+      console.log(xUnit)
+      console.log(yUnit)
+    }
+
+    
+    // setUserTable({...userTable,graphData:graphData.processeData,isSameUnit:true,serialNumber:graphData.serialNumber,average:graphData.average})
+    
     
     // let unit = pg['databaseSensor'].find(el=>el['sensor_name'] === userTable.selected[0].slice(7))['unit']
     // for(let table of userTable.selected){
