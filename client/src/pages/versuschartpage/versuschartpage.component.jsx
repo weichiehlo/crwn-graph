@@ -20,8 +20,6 @@ import { convertGraphDataForVersus } from '../../utils/graph.utils'
 
 const VersusChartPage = ({fetchPgStart,pg,isFetching}) => {
 
-    const graphType = ['Area', 'Bar', 'Line', 'Scatter'];
-
     const initialState = {
       model: '',
       xTable: '',
@@ -41,11 +39,7 @@ const VersusChartPage = ({fetchPgStart,pg,isFetching}) => {
       all:[],
       selected:[],
       graphData:[],
-      serialNumber:{},
-      average:{},
-      percision:3,
-      type:'Area',
-      isSameUnit:true});
+      percision:3});
 
 
   useEffect(() => {
@@ -167,6 +161,7 @@ const VersusChartPage = ({fetchPgStart,pg,isFetching}) => {
       yUnit = pg['databaseSensor'].find(el=>el['sensor_name'] === table.split(" vs ")[1])['unit']
       console.log(xUnit)
       console.log(yUnit)
+      console.log(graphData[table])
     }
 
     
@@ -287,10 +282,13 @@ const VersusChartPage = ({fetchPgStart,pg,isFetching}) => {
       
       {
         graphInfo['xTable'] || graphInfo['yTable']?
-        !isFetching?
-        < CustomButton type='submit'>Add to Graph</CustomButton>
-        :
-        <Spinner/>
+          !isFetching?
+            graphInfo['xTable'] === graphInfo['yTable']?
+            <Warning>X sensor cannot be the same as Y sensor</Warning>
+            :
+            < CustomButton type='submit'>Add to Graph</CustomButton>
+          :
+            <Spinner/>
         :
         <div/>
       }
@@ -317,25 +315,11 @@ const VersusChartPage = ({fetchPgStart,pg,isFetching}) => {
                   onChange={(el)=>setUserTable({...userTable,percision:el.value})}
                   required
                   />
-          <FormSelect
-                  label='graphType'
-                  placeholder=""
-                  value={{value:userTable['type'],label:userTable['type']}}
-                  options={graphType.map(el=>({value:el,label:el}))}
-                  onChange={(el)=>setUserTable({...userTable,type:el.value})}
-                  required
-                  />
           {
             userTable.selected.length && ! isFetching?
             < CustomButton>Graph Selected</CustomButton>
             :
             <div/>
-          }
-          {
-            userTable.isSameUnit?
-            <div/>
-            :
-            <Warning>Please make sure the units are the same</Warning>
           }
         </FormContainer>
         
@@ -344,7 +328,8 @@ const VersusChartPage = ({fetchPgStart,pg,isFetching}) => {
       }
       {
         userTable['graphData'].length?
-        <ComposedChartComponent data={userTable['graphData']} serialNumber={userTable['serialNumber'] } average={userTable['average'] } type={userTable['type']}/>
+        // <ComposedChartComponent data={userTable['graphData']} serialNumber={userTable['serialNumber'] } average={userTable['average'] } type={userTable['type']}/>
+        <div/>
         :
         <div/>
       }

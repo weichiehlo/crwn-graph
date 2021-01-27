@@ -252,13 +252,14 @@ export const convertGraphDataForVersus = (data,percision)=>{
         yCurrentRange += yInterval
     }
     
-    console.log(xRange)
-    console.log(yRange)
+    // console.log(xRange)
+    // console.log(yRange)
 
     // processedData[table] = {};
 
-    console.log(data[table].length)
+    // console.log(data[table].length)
     
+    let tempArray = [];
     for(let i=0; i<xRange.length-1;i++){
         let temp = {}
         temp['name'] = `${xRange[i].toFixed(xDigit)}-${xRange[i+1].toFixed(xDigit)}`
@@ -271,16 +272,18 @@ export const convertGraphDataForVersus = (data,percision)=>{
             }
             temp[`${yRange[j].toFixed(yDigit)}-${yRange[j+1].toFixed(yDigit)}`] = tempCount
         }
-        console.log(temp)
+        // console.log(temp)
+        tempArray.push(temp);
         
     }
-
-    
-    
+    processedData[table] = tempArray
 
    }
     
-
+//    console.log('--------')
+//    console.log(processedData)
+//    console.log('--------')
+   return processedData
 }
 
 export const compareUnit = (sensors,table)=>{
