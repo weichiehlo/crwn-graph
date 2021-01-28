@@ -1,5 +1,5 @@
 import React, {useState,useEffect} from 'react';
-import ComposedChartComponent from '../../components/composed-chart/composed-chart.component'
+import VersusChartComponent from '../../components/versus-chart/versus-chart.component'
 import { FormContainer, VersusChartPageContainer, Warning} from './versuschartpage.styles'
 import { FormInput, FormSelect} from '../../components/form-input/form-input.component';
 import CustomButton from '../../components/custom-button/custom-button.component';
@@ -14,6 +14,7 @@ import 'react-date-range/dist/theme/default.css'; // theme css file
 import { DateRangePicker  } from 'react-date-range';
 import { formatDate } from '../../utils/inputs.utils'
 import { convertGraphDataForVersus } from '../../utils/graph.utils'
+
 
 
 
@@ -38,7 +39,7 @@ const VersusChartPage = ({fetchPgStart,pg,isFetching}) => {
     const [userTable, setUserTable] = useState({
       all:[],
       selected:[],
-      graphData:[],
+      graphData:{},
       percision:3});
 
 
@@ -146,45 +147,23 @@ const VersusChartPage = ({fetchPgStart,pg,isFetching}) => {
     
     let raw = {};
     let xUnit, yUnit;
-    for(let table of userTable.selected){
+    for(let table of userTable['selected']){
       raw[table] = pg[table]
     }
 
-    console.log(raw)
-
-    let graphData = convertGraphDataForVersus(raw,userTable['percision']);
-    
+    let convertedData = convertGraphDataForVersus(raw,userTable['percision']);
+    let convertedDataWithUnit = {}
 
     for(let table of userTable.selected){
 
       xUnit = pg['databaseSensor'].find(el=>el['sensor_name'] === table.split(" vs ")[0].slice(7))['unit']
       yUnit = pg['databaseSensor'].find(el=>el['sensor_name'] === table.split(" vs ")[1])['unit']
-      console.log(xUnit)
-      console.log(yUnit)
-      console.log(graphData[table])
+      convertedDataWithUnit[table] = {'data':convertedData[table],'xUnit':xUnit,'yUnit':yUnit}
     }
+    setUserTable({...userTable,graphData:convertedDataWithUnit})
 
+    console.log(convertedDataWithUnit)
     
-    // setUserTable({...userTable,graphData:graphData.processeData,isSameUnit:true,serialNumber:graphData.serialNumber,average:graphData.average})
-    
-    
-    // let unit = pg['databaseSensor'].find(el=>el['sensor_name'] === userTable.selected[0].slice(7))['unit']
-    // for(let table of userTable.selected){
-    //   unit = pg['databaseSensor'].find(el=>el['sensor_name'] === table.slice(7))['unit']
-    //   raw[`${table} (${unit})`] = pg[table].map((el)=>({reading:el['reading'],serial_number:el['serial_number']}))
-    // }
-
-    // let graphData = convertGraphDataForComposed(raw,userTable['percision']);
-    // if(compareUnit(userTable.selected.map(el=>el.slice(7)),pg['databaseSensor'])){
-    //   setUserTable({...userTable,graphData:graphData.processeData,isSameUnit:true,serialNumber:graphData.serialNumber,average:graphData.average})
-    // }else{
-    //   setUserTable({...userTable,isSameUnit:false})
-    // }
-
-
-    
-
-
   }
  
   
@@ -327,9 +306,9 @@ const VersusChartPage = ({fetchPgStart,pg,isFetching}) => {
         <div/>
       }
       {
-        userTable['graphData'].length?
+        Object.keys(userTable['graphData']).length?
         // <ComposedChartComponent data={userTable['graphData']} serialNumber={userTable['serialNumber'] } average={userTable['average'] } type={userTable['type']}/>
-        <div/>
+        <VersusChartComponent data={userTable['graphData']}/>
         :
         <div/>
       }
