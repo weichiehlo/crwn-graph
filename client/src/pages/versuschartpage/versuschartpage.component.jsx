@@ -307,7 +307,6 @@ const VersusChartPage = ({fetchPgStart,pg,isFetching}) => {
       }
       {
         Object.keys(userTable['graphData']).length?
-        // <ComposedChartComponent data={userTable['graphData']} serialNumber={userTable['serialNumber'] } average={userTable['average'] } type={userTable['type']}/>
         <VersusChartComponent data={userTable['graphData']}/>
         :
         <div/>

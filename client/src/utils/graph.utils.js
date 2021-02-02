@@ -279,10 +279,21 @@ export const convertGraphDataForVersus = (data,percision)=>{
     processedData[table] = tempArray
 
    }
+
+   //convert to percentage
+   for(let table in processedData){
+        for(let interval of processedData[table]){
+
+            let total = Object.keys(interval).filter(el=>el !== 'name').reduce((a,val)=>a+interval[val],0)
+            for(let el of Object.keys(interval).filter(el=>el !== 'name')){
+                interval[el] = ((interval[el]/total) * 100).toFixed(1)
+            }
+        }
+   }
     
-//    console.log('--------')
-//    console.log(processedData)
-//    console.log('--------')
+    // console.log('--------')
+    // console.log(processedData)
+    // console.log('--------')
    return processedData
 }
 

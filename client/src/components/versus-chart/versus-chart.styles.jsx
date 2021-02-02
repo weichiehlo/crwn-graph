@@ -18,4 +18,17 @@ export const Title = styled.h1`
   margin-bottom: 50px;
 `;
 
+export const XChartContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items:center;
+`;
+
+export const YChartContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items:center;
+`;
 
