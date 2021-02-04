@@ -4,7 +4,9 @@ import { FormContainer, ComposedChartPageContainer, Warning} from './composedcha
 import { FormInput, FormSelect} from '../../components/form-input/form-input.component';
 import CustomButton from '../../components/custom-button/custom-button.component';
 import { fetchPgStart } from '../../redux/pg/pg.actions'
+import { setUserGraph } from '../../redux/graph/graph.actions'
 import { selectPg, selectIsPgFetching } from '../../redux/pg/pg.selectors';
+import { selectUserGraph } from '../../redux/graph/graph.selectors'
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
 import Spinner from '../../components/spinner/spinner.component';
@@ -18,7 +20,7 @@ import { convertGraphDataForComposed, compareUnit } from '../../utils/graph.util
 
 
 
-const ComposedChartPage = ({fetchPgStart,pg,isFetching}) => {
+const ComposedChartPage = ({fetchPgStart,pg,isFetching,setUserGraph, userGraph}) => {
 
     const graphType = ['Area', 'Bar', 'Line', 'Scatter'];
 
@@ -36,22 +38,13 @@ const ComposedChartPage = ({fetchPgStart,pg,isFetching}) => {
     }
     
     const [graphInfo, setgraphInfo] = useState(initialState);
-    const [userTable, setUserTable] = useState({
-      all:[],
-      selected:[],
-      graphData:[],
-      serialNumber:{},
-      average:{},
-      percision:3,
-      type:'Area',
-      isSameUnit:true});
 
 
   useEffect(() => {
     const helper = async()=>{
        //fetch the name of the databases
        await fetchPgStart({title:'databaseModel', query:`SELECT datname FROM pg_database WHERE datname != 'template1' AND datname != 'template0' AND datname != 'postgres'`, database: ''})
-    }
+      }
     helper();
   }, []);
 
@@ -112,7 +105,12 @@ const ComposedChartPage = ({fetchPgStart,pg,isFetching}) => {
     AND serial_number >= '${lowerSN}' AND serial_number <= '${upperSN}' 
     ${testTypeString} ORDER BY reading`,
     database: model})
-    setUserTable({...userTable,all:[...userTable.all,tableName]})
+    
+    setUserGraph({
+      composed: {...userGraph.composed,all:[...userGraph.composed.all,tableName]},
+      pie: userGraph.pie,
+      versus: userGraph.versus
+    })
     
   };
 
@@ -143,22 +141,27 @@ const ComposedChartPage = ({fetchPgStart,pg,isFetching}) => {
     event.preventDefault()
     let raw = {};
     
-    let unit = pg['databaseSensor'].find(el=>el['sensor_name'] === userTable.selected[0].slice(7))['unit']
-    for(let table of userTable.selected){
+    let unit = pg['databaseSensor'].find(el=>el['sensor_name'] === userGraph.composed.selected[0].slice(7))['unit']
+    for(let table of userGraph.composed.selected){
       unit = pg['databaseSensor'].find(el=>el['sensor_name'] === table.slice(7))['unit']
       raw[`${table} (${unit})`] = pg[table].map((el)=>({reading:el['reading'],serial_number:el['serial_number']}))
     }
 
-    let graphData = convertGraphDataForComposed(raw,userTable['percision']);
-    if(compareUnit(userTable.selected.map(el=>el.slice(7)),pg['databaseSensor'])){
-      setUserTable({...userTable,graphData:graphData.processeData,isSameUnit:true,serialNumber:graphData.serialNumber,average:graphData.average})
+    let graphData = convertGraphDataForComposed(raw,userGraph.composed['percision']);
+    if(compareUnit(userGraph.composed.selected.map(el=>el.slice(7)),pg['databaseSensor'])){
+      
+      setUserGraph({
+        composed: {...userGraph.composed,graphData:graphData.processeData,isSameUnit:true,serialNumber:graphData.serialNumber,average:graphData.average},
+        pie: userGraph.pie,
+        versus: userGraph.versus
+      })
     }else{
-      setUserTable({...userTable,isSameUnit:false})
+      setUserGraph({
+        composed: {...userGraph.composed,isSameUnit:false},
+        pie: userGraph.pie,
+        versus: userGraph.versus
+      })
     }
-
-
-    
-
 
   }
  
@@ -166,16 +169,16 @@ const ComposedChartPage = ({fetchPgStart,pg,isFetching}) => {
   return (
     <ComposedChartPageContainer>
       <FormContainer onSubmit={handleSubmit}>
-        {pg['databaseModel']?
+        { pg['databaseModel']?
           <FormSelect
           label='Model'
           placeholder=""
           options={pg['databaseModel'].map((el)=>({value:el['datname'],label:el['datname']}))}
           onChange={(el)=>handleChange({...el,name:'model'})}
           required
-        />
-        :
-         <Spinner/>
+          />
+          :
+          <Spinner/>
         }
         {
         graphInfo['model']?
@@ -244,53 +247,76 @@ const ComposedChartPage = ({fetchPgStart,pg,isFetching}) => {
           <div/>    
           }
       
-      {
-        graphInfo['table']?
-        !isFetching?
-        < CustomButton type='submit'>Add to Graph</CustomButton>
-        :
-        <Spinner/>
-        :
-        <div/>
-      }
+        {
+          graphInfo['table']?
+            !isFetching?
+            <CustomButton type='submit'> Add to Graph </CustomButton>
+            :
+            <Spinner/>
+          :
+          <div/>
+        }
+
       </FormContainer>
+
+      
       {
-        userTable['all'].length?
+        userGraph.composed['all'].length?
         <FormContainer onSubmit={handleGraph}>
           <FormSelect
                   label='User Tables'
                   placeholder="Select Tables"
                   isMulti
                   name="userTable"
-                  value={userTable.selected.map((el)=>({value:el,label:el}))}
-                  options={userTable.all.map((el)=>({value:el,label:el}))}
-                  onChange={(el)=>(el?setUserTable({...userTable,selected:el.map(el=>el.value)}):setUserTable({...userTable,selected:[]}))}
+                  value={userGraph.composed.selected.map((el)=>({value:el,label:el}))}
+                  options={userGraph.composed.all.map((el)=>({value:el,label:el}))}
+                  onChange={(el)=>(el?setUserGraph({
+                    composed: {...userGraph.composed,selected:el.map(el=>el.value)},
+                    pie: userGraph.pie,
+                    versus: userGraph.versus
+                  }):
+                  setUserGraph({
+                    composed: {...userGraph.composed,selected:[]},
+                    pie: userGraph.pie,
+                    versus: userGraph.versus
+                  })
+                  )}
                   required
                   />
           <FormSelect
                   label='Percision'
                   placeholder=""
-                  value={{value:userTable['percision'],label:userTable['percision']}}
+                  value={{value:userGraph.composed['percision'],label:userGraph.composed['percision']}}
                   options={[...new Array(10).keys()].map(el=>({value:el+1,label:el+1}))}
-                  onChange={(el)=>setUserTable({...userTable,percision:el.value})}
+                  onChange={(el)=>(setUserGraph({
+                    composed: {...userGraph.composed,percision:el.value},
+                    pie: userGraph.pie,
+                    versus: userGraph.versus
+                  })
+                  )}
                   required
                   />
           <FormSelect
                   label='graphType'
                   placeholder=""
-                  value={{value:userTable['type'],label:userTable['type']}}
+                  value={{value:userGraph.composed['type'],label:userGraph.composed['type']}}
                   options={graphType.map(el=>({value:el,label:el}))}
-                  onChange={(el)=>setUserTable({...userTable,type:el.value})}
+                  onChange={(el)=>(setUserGraph({
+                    composed: {...userGraph.composed,type:el.value},
+                    pie: userGraph.pie,
+                    versus: userGraph.versus
+                  })
+                  )}
                   required
                   />
           {
-            userTable.selected.length && ! isFetching?
-            < CustomButton>Graph Selected</CustomButton>
+            userGraph.composed.selected.length && ! isFetching?
+            <CustomButton>Graph Selected</CustomButton>
             :
             <div/>
           }
           {
-            userTable.isSameUnit?
+            userGraph.composed.isSameUnit?
             <div/>
             :
             <Warning>Please make sure the units are the same</Warning>
@@ -301,8 +327,8 @@ const ComposedChartPage = ({fetchPgStart,pg,isFetching}) => {
         <div/>
       }
       {
-        userTable['graphData'].length?
-        <ComposedChartComponent data={userTable['graphData']} serialNumber={userTable['serialNumber'] } average={userTable['average'] } type={userTable['type']}/>
+        userGraph.composed['graphData'] && userGraph.composed['graphData'].length?
+        <ComposedChartComponent data={ userGraph.composed['graphData']} serialNumber={ userGraph.composed['serialNumber'] } average={ userGraph.composed['average'] } type= {userGraph.composed['type']}/>
         :
         <div/>
       }
@@ -315,11 +341,13 @@ const ComposedChartPage = ({fetchPgStart,pg,isFetching}) => {
 
 const mapStateToProps = createStructuredSelector({
   pg: selectPg,
-  isFetching: selectIsPgFetching
+  isFetching: selectIsPgFetching,
+  userGraph: selectUserGraph
 });
 
 const mapDispatchToProps = dispatch => ({
-  fetchPgStart: (info) => dispatch(fetchPgStart(info))
+  fetchPgStart: (info) => dispatch(fetchPgStart(info)),
+  setUserGraph: (userGraph) => dispatch(setUserGraph(userGraph))
 });
 export default connect(
   mapStateToProps,
