@@ -10,8 +10,20 @@ const INITIAL_STATE = {
     percision:3,
     type:'Area',
     isSameUnit:true},
-  pie: [],
-  versus: []
+  pie: {
+    all:[],
+    selected:[],
+    graphData:{},
+    serialNumber:{},
+    average:{},
+    percision:3,
+    type:'Pie(Simple)',
+    isSameUnit:true},
+  versus: {
+    all:[],
+    selected:[],
+    graphData:{},
+    percision:3}
 };
 
 const graphReducer = (state = INITIAL_STATE, action) => {

@@ -4,7 +4,9 @@ import { FormContainer, VersusChartPageContainer, Warning} from './versuschartpa
 import { FormInput, FormSelect} from '../../components/form-input/form-input.component';
 import CustomButton from '../../components/custom-button/custom-button.component';
 import { fetchPgStart } from '../../redux/pg/pg.actions'
+import { setUserGraph } from '../../redux/graph/graph.actions'
 import { selectPg, selectIsPgFetching } from '../../redux/pg/pg.selectors';
+import { selectUserGraph } from '../../redux/graph/graph.selectors'
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
 import Spinner from '../../components/spinner/spinner.component';
@@ -19,7 +21,7 @@ import { convertGraphDataForVersus } from '../../utils/graph.utils'
 
 
 
-const VersusChartPage = ({fetchPgStart,pg,isFetching}) => {
+const VersusChartPage = ({fetchPgStart,pg,isFetching,setUserGraph, userGraph}) => {
 
     const initialState = {
       model: '',
@@ -36,11 +38,7 @@ const VersusChartPage = ({fetchPgStart,pg,isFetching}) => {
     }
     
     const [graphInfo, setgraphInfo] = useState(initialState);
-    const [userTable, setUserTable] = useState({
-      all:[],
-      selected:[],
-      graphData:{},
-      percision:3});
+ 
 
 
   useEffect(() => {
@@ -114,7 +112,11 @@ const VersusChartPage = ({fetchPgStart,pg,isFetching}) => {
     AND "${xTable}".serial_number >= '${lowerSN}' AND "${xTable}".serial_number <= '${upperSN}' 
       ${testTypeString}`,
     database: model})
-    setUserTable({...userTable,all:[...userTable.all,tableName]})
+    setUserGraph({
+      composed: userGraph.composed,
+      pie: userGraph.pie,
+      versus: {...userGraph.versus,all:[...userGraph.versus.all,tableName]}
+    })
     
   };
 
@@ -142,25 +144,29 @@ const VersusChartPage = ({fetchPgStart,pg,isFetching}) => {
 
   const handleGraph = (event) =>{
 
-    event.preventDefault(userTable['percision'])
+    event.preventDefault(userGraph.versus['percision'])
 
     
     let raw = {};
     let xUnit, yUnit;
-    for(let table of userTable['selected']){
+    for(let table of userGraph.versus['selected']){
       raw[table] = pg[table]
     }
 
-    let convertedData = convertGraphDataForVersus(raw,userTable['percision']);
+    let convertedData = convertGraphDataForVersus(raw,userGraph.versus['percision']);
     let convertedDataWithUnit = {}
 
-    for(let table of userTable.selected){
+    for(let table of userGraph.versus.selected){
 
       xUnit = pg['databaseSensor'].find(el=>el['sensor_name'] === table.split(" vs ")[0].slice(7))['unit']
       yUnit = pg['databaseSensor'].find(el=>el['sensor_name'] === table.split(" vs ")[1])['unit']
       convertedDataWithUnit[table] = {'data':convertedData[table],'xUnit':xUnit,'yUnit':yUnit}
     }
-    setUserTable({...userTable,graphData:convertedDataWithUnit})
+    setUserGraph({
+      composed: userGraph.composed,
+      pie: userGraph.pie,
+      versus: {...userGraph.versus,graphData:convertedDataWithUnit}
+    })
 
     console.log(convertedDataWithUnit)
     
@@ -265,7 +271,7 @@ const VersusChartPage = ({fetchPgStart,pg,isFetching}) => {
             graphInfo['xTable'] === graphInfo['yTable']?
             <Warning>X sensor cannot be the same as Y sensor</Warning>
             :
-            < CustomButton type='submit'>Add to Graph</CustomButton>
+            <CustomButton type='submit'>Add to Graph</CustomButton>
           :
             <Spinner/>
         :
@@ -274,29 +280,50 @@ const VersusChartPage = ({fetchPgStart,pg,isFetching}) => {
       </FormContainer>
 
       {
-        userTable['all'].length?
+        userGraph.versus['all'].length?
         <FormContainer onSubmit={handleGraph}>
           <FormSelect
                   label='User Tables'
                   placeholder="Select Tables"
                   isMulti
                   name="userTable"
-                  value={userTable.selected.map((el)=>({value:el,label:el}))}
-                  options={userTable.all.map((el)=>({value:el,label:el}))}
-                  onChange={(el)=>(el?setUserTable({...userTable,selected:el.map(el=>el.value)}):setUserTable({...userTable,selected:[]}))}
+                  value={userGraph.versus.selected.map((el)=>({value:el,label:el}))}
+                  options={userGraph.versus.all.map((el)=>({value:el,label:el}))}
+                  onChange={(el)=>(el?
+                    setUserGraph({
+                      composed: userGraph.composed,
+                      pie: userGraph.pie,
+                      versus: {...userGraph.versus,selected:el.map(el=>el.value)}
+                    })
+                    :
+                    setUserGraph({
+                      composed: userGraph.composed,
+                      pie: userGraph.pie,
+                      versus: {...userGraph.versus,selected:[]}
+                    })
+                    
+                    )
+                  }
+
                   required
                   />
           <FormSelect
                   label='Percision'
                   placeholder=""
-                  value={{value:userTable['percision'],label:userTable['percision']}}
+                  value={{value:userGraph.versus['percision'],label:userGraph.versus['percision']}}
                   options={[...new Array(10).keys()].map(el=>({value:el+1,label:el+1}))}
-                  onChange={(el)=>setUserTable({...userTable,percision:el.value})}
+                  onChange={(el)=>
+                    setUserGraph({
+                      composed: userGraph.composed,
+                      pie: userGraph.pie,
+                      versus: {...userGraph.versus,percision:el.value}
+                    })
+                  }
                   required
                   />
           {
-            userTable.selected.length && ! isFetching?
-            < CustomButton>Graph Selected</CustomButton>
+            userGraph.versus.selected.length && ! isFetching?
+            <CustomButton>Graph Selected</CustomButton>
             :
             <div/>
           }
@@ -306,8 +333,8 @@ const VersusChartPage = ({fetchPgStart,pg,isFetching}) => {
         <div/>
       }
       {
-        Object.keys(userTable['graphData']).length?
-        <VersusChartComponent data={userTable['graphData']}/>
+        Object.keys(userGraph.versus['graphData']).length?
+        <VersusChartComponent data={userGraph.versus['graphData']}/>
         :
         <div/>
       }
@@ -320,12 +347,15 @@ const VersusChartPage = ({fetchPgStart,pg,isFetching}) => {
 
 const mapStateToProps = createStructuredSelector({
   pg: selectPg,
-  isFetching: selectIsPgFetching
+  isFetching: selectIsPgFetching,
+  userGraph: selectUserGraph
 });
 
 const mapDispatchToProps = dispatch => ({
-  fetchPgStart: (info) => dispatch(fetchPgStart(info))
+  fetchPgStart: (info) => dispatch(fetchPgStart(info)),
+  setUserGraph: (userGraph) => dispatch(setUserGraph(userGraph))
 });
+
 export default connect(
   mapStateToProps,
   mapDispatchToProps

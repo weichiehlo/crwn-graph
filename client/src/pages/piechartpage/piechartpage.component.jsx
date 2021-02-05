@@ -5,6 +5,8 @@ import { FormInput, FormSelect} from '../../components/form-input/form-input.com
 import CustomButton from '../../components/custom-button/custom-button.component';
 import { fetchPgStart } from '../../redux/pg/pg.actions'
 import { selectPg, selectIsPgFetching } from '../../redux/pg/pg.selectors';
+import { selectUserGraph } from '../../redux/graph/graph.selectors'
+import { setUserGraph } from '../../redux/graph/graph.actions'
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
 import Spinner from '../../components/spinner/spinner.component';
@@ -18,7 +20,7 @@ import { convertGraphDataForPie, compareUnit } from '../../utils/graph.utils'
 
 
 
-const PieChartPage = ({fetchPgStart,pg,isFetching}) => {
+const PieChartPage = ({fetchPgStart,pg,isFetching,setUserGraph, userGraph}) => {
 
     const graphType = ['Pie(Interactive)','Pie(Simple)'];
 
@@ -36,15 +38,6 @@ const PieChartPage = ({fetchPgStart,pg,isFetching}) => {
     }
     
     const [graphInfo, setgraphInfo] = useState(initialState);
-    const [userTable, setUserTable] = useState({
-      all:[],
-      selected:[],
-      graphData:{},
-      serialNumber:{},
-      average:{},
-      percision:3,
-      type:'Pie(Simple)',
-      isSameUnit:true});
 
 
   useEffect(() => {
@@ -114,7 +107,11 @@ const PieChartPage = ({fetchPgStart,pg,isFetching}) => {
     AND serial_number >= '${lowerSN}' AND serial_number <= '${upperSN}' 
     ${testTypeString} ORDER BY reading`,
     database: model})
-    setUserTable({...userTable,all:[...userTable.all,tableName]})
+    setUserGraph({
+      composed: userGraph.composed,
+      pie: {...userGraph.pie,all:[...userGraph.pie.all,tableName]},
+      versus: userGraph.versus
+    })
     
   };
 
@@ -143,17 +140,25 @@ const PieChartPage = ({fetchPgStart,pg,isFetching}) => {
     event.preventDefault()
     let raw = {};
     
-    let unit = pg['databaseSensor'].find(el=>el['sensor_name'] === userTable.selected[0].slice(7))['unit']
-    for(let table of userTable.selected){
+    let unit = pg['databaseSensor'].find(el=>el['sensor_name'] === userGraph.pie.selected[0].slice(7))['unit']
+    for(let table of userGraph.pie.selected){
       unit = pg['databaseSensor'].find(el=>el['sensor_name'] === table.slice(7))['unit']
       raw[`${table} (${unit})`] = pg[table].map((el)=>({reading:el['reading'],serial_number:el['serial_number']}))
     }
 
-    let graphData = convertGraphDataForPie(raw,userTable['percision']);
-    if(compareUnit(userTable.selected.map(el=>el.slice(7)),pg['databaseSensor'])){
-      setUserTable({...userTable,graphData:graphData.processeData,isSameUnit:true,serialNumber:graphData.serialNumber,average:graphData.average})
+    let graphData = convertGraphDataForPie(raw,userGraph.pie['percision']);
+    if(compareUnit(userGraph.pie.selected.map(el=>el.slice(7)),pg['databaseSensor'])){
+      setUserGraph({
+        composed: userGraph.composed,
+        pie: {...userGraph.pie,graphData:graphData.processeData,isSameUnit:true,serialNumber:graphData.serialNumber,average:graphData.average},
+        versus: userGraph.versus
+      })
     }else{
-      setUserTable({...userTable,isSameUnit:false})
+      setUserGraph({
+        composed: userGraph.composed,
+        pie: {...userGraph.pie,isSameUnit:false},
+        versus: userGraph.versus
+      })
     }
 
 
@@ -247,7 +252,7 @@ const PieChartPage = ({fetchPgStart,pg,isFetching}) => {
       {
         graphInfo['table']?
         !isFetching?
-        < CustomButton type='submit'>Add to Graph</CustomButton>
+        <CustomButton type='submit'>Add to Graph</CustomButton>
         :
         <Spinner/>
         :
@@ -255,42 +260,62 @@ const PieChartPage = ({fetchPgStart,pg,isFetching}) => {
       }
       </FormContainer>
       {
-        userTable['all'].length?
+        userGraph.pie['all'].length?
         <FormContainer onSubmit={handleGraph}>
           <FormSelect
                   label='User Tables'
                   placeholder="Select Tables"
                   isMulti
                   name="userTable"
-                  value={userTable.selected.map((el)=>({value:el,label:el}))}
-                  options={userTable.all.map((el)=>({value:el,label:el}))}
-                  onChange={(el)=>(el?setUserTable({...userTable,selected:el.map(el=>el.value)}):setUserTable({...userTable,selected:[]}))}
+                  value={userGraph.pie.selected.map((el)=>({value:el,label:el}))}
+                  options={userGraph.pie.all.map((el)=>({value:el,label:el}))}
+                  onChange={(el)=>(el?setUserGraph({
+                    composed: userGraph.composed,
+                    pie: {...userGraph.pie,selected:el.map(el=>el.value)},
+                    versus: userGraph.versus
+                  }):
+                  setUserGraph({
+                    composed: userGraph.composed,
+                    pie: {...userGraph.pie,selected:[]},
+                    versus: userGraph.versus
+                  })
+                  )}
                   required
                   />
           <FormSelect
                   label='Percision'
                   placeholder=""
-                  value={{value:userTable['percision'],label:userTable['percision']}}
+                  value={{value:userGraph.pie['percision'],label:userGraph.pie['percision']}}
                   options={[...new Array(10).keys()].map(el=>({value:el+1,label:el+1}))}
-                  onChange={(el)=>setUserTable({...userTable,percision:el.value})}
+                  onChange={(el)=>(setUserGraph({
+                    composed: userGraph.composed,
+                    pie: {...userGraph.pie,percision:el.value},
+                    versus: userGraph.versus
+                  })
+                  )}
                   required
                   />
           <FormSelect
                   label='graphType'
                   placeholder=""
-                  value={{value:userTable['type'],label:userTable['type']}}
+                  value={{value:userGraph.pie['type'],label:userGraph.pie['type']}}
                   options={graphType.map(el=>({value:el,label:el}))}
-                  onChange={(el)=>setUserTable({...userTable,type:el.value})}
+                  onChange={(el)=>(setUserGraph({
+                    composed: userGraph.composed,
+                    pie: {...userGraph.pie,type:el.value},
+                    versus: userGraph.versus
+                  })
+                  )}
                   required
                   />
           {
-            userTable.selected.length && ! isFetching?
-            < CustomButton>Graph Selected</CustomButton>
+            userGraph.pie.selected.length && ! isFetching?
+            <CustomButton>Graph Selected</CustomButton>
             :
             <div/>
           }
           {
-            userTable.isSameUnit?
+            userGraph.pie.isSameUnit?
             <div/>
             :
             <Warning>Please make sure the units are the same</Warning>
@@ -301,8 +326,8 @@ const PieChartPage = ({fetchPgStart,pg,isFetching}) => {
         <div/>
       }
       {
-        Object.keys(userTable['graphData']).length?
-        <PieChartComponent data={userTable['graphData']} serialNumber={userTable['serialNumber'] } average={userTable['average'] } type={userTable['type']}/>
+        Object.keys(userGraph.pie['graphData']).length?
+        <PieChartComponent data={userGraph.pie['graphData']} serialNumber={userGraph.pie['serialNumber'] } average={userGraph.pie['average'] } type={userGraph.pie['type']}/>
         :
         <div/>
       }
@@ -315,12 +340,15 @@ const PieChartPage = ({fetchPgStart,pg,isFetching}) => {
 
 const mapStateToProps = createStructuredSelector({
   pg: selectPg,
-  isFetching: selectIsPgFetching
+  isFetching: selectIsPgFetching,
+  userGraph: selectUserGraph
 });
 
 const mapDispatchToProps = dispatch => ({
-  fetchPgStart: (info) => dispatch(fetchPgStart(info))
+  fetchPgStart: (info) => dispatch(fetchPgStart(info)),
+  setUserGraph: (userGraph) => dispatch(setUserGraph(userGraph))
 });
+
 export default connect(
   mapStateToProps,
   mapDispatchToProps
