@@ -130,3 +130,41 @@ export default firebase;
 // }
 
 
+export const addGraphToFireStore = async (userAuth, graphs)=>{
+
+    if(!userAuth) return;
+    const userRef = firestore.doc(`graphs/${userAuth.uid}`)
+
+    graphs = {...{userId:userAuth.uid},...{graphs:graphs}}
+
+    const snapShot = await userRef.get()
+    if(!snapShot.exists){
+        try{
+            await userRef.set(graphs)
+
+        } catch(error){
+            console.log('error saving graphs', error.message)
+        }
+    }else{
+        try{
+            await userRef.set(graphs)
+
+        } catch(error){
+            console.log('error updating graphs', error.message)
+        }
+    }
+}
+
+export const loadGraphFromFireStore= async(userAuth) =>{
+    if(!userAuth) return []
+    const graphsRef = firestore.collection('graphs');
+    const query = graphsRef.where("userId", "==", userAuth.uid);
+    const snapshot = await query.get()
+    const graphNames = snapshot.docs.map(doc =>{
+        return doc.data()['graphs']
+    })
+    return graphNames[0]
+    
+}
+
+

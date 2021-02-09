@@ -5,7 +5,7 @@ import { FormInput, FormSelect} from '../../components/form-input/form-input.com
 import CustomButton from '../../components/custom-button/custom-button.component';
 import { fetchPgStart } from '../../redux/pg/pg.actions'
 import { setUserGraph } from '../../redux/graph/graph.actions'
-import { selectPg, selectIsPgFetching } from '../../redux/pg/pg.selectors';
+import { selectPg, selectIsPgFetching, selectPgSql } from '../../redux/pg/pg.selectors';
 import { selectUserGraph } from '../../redux/graph/graph.selectors'
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
@@ -16,11 +16,12 @@ import 'react-date-range/dist/theme/default.css'; // theme css file
 import { DateRangePicker  } from 'react-date-range';
 import { formatDate } from '../../utils/inputs.utils'
 import { convertGraphDataForComposed, compareUnit } from '../../utils/graph.utils'
+import {getCurrentUser,loadGraphFromFireStore} from '../../firebase/firebase.utils'
 
 
 
 
-const ComposedChartPage = ({fetchPgStart,pg,isFetching,setUserGraph, userGraph}) => {
+const ComposedChartPage = ({fetchPgStart,pg,isFetching,setUserGraph, userGraph, selectPgSql}) => {
 
     const graphType = ['Area', 'Bar', 'Line', 'Scatter'];
 
@@ -44,6 +45,24 @@ const ComposedChartPage = ({fetchPgStart,pg,isFetching,setUserGraph, userGraph})
     const helper = async()=>{
        //fetch the name of the databases
        await fetchPgStart({title:'databaseModel', query:`SELECT datname FROM pg_database WHERE datname != 'template1' AND datname != 'template0' AND datname != 'postgres'`, database: ''})
+       //load graph
+      const user = await getCurrentUser();
+      const firebaseGraphs = await loadGraphFromFireStore(user)
+      console.log('----------------')
+      console.log(firebaseGraphs)
+      console.log('----------------')
+      
+      
+      
+      if(firebaseGraphs && !Array.isArray(firebaseGraphs)){
+        for(let sql of firebaseGraphs.sql){
+          await fetchPgStart({title: sql.title, query: sql.query, database: sql.database})
+        }
+        setUserGraph(firebaseGraphs)
+      }
+      
+        
+      
       }
     helper();
   }, []);
@@ -342,7 +361,8 @@ const ComposedChartPage = ({fetchPgStart,pg,isFetching,setUserGraph, userGraph})
 const mapStateToProps = createStructuredSelector({
   pg: selectPg,
   isFetching: selectIsPgFetching,
-  userGraph: selectUserGraph
+  userGraph: selectUserGraph,
+  sql: selectPgSql
 });
 
 const mapDispatchToProps = dispatch => ({

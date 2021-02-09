@@ -4,6 +4,8 @@ import { createStructuredSelector } from 'reselect';
 
 import { selectCurrentUser } from '../../redux/user/user.selectors';
 import { selectStockNames } from '../../redux/stock-price/stock-price.selectors.js'
+import { selectUserGraph } from '../../redux/graph/graph.selectors'
+import { selectPgSql } from '../../redux/pg/pg.selectors';
 import { signOutStart } from '../../redux/user/user.actions';
 
 
@@ -17,7 +19,7 @@ import {
   PagesNavContainer
 } from './header.styles';
 
-const Header = ({ currentUser, hidden, signOutStart,stockNames}) => (
+const Header = ({ currentUser, hidden, signOutStart,stockNames,userGraph, sql}) => (
   <HeaderContainer>
     <LogoContainer to='/'>
       <Logo className='logo' />
@@ -33,7 +35,7 @@ const Header = ({ currentUser, hidden, signOutStart,stockNames}) => (
       <OptionLink to='/checkout'>DONATE</OptionLink>
       <OptionLink to='/contact'>CONTACT</OptionLink>
       {currentUser ? (
-        <OptionLink as='div' onClick={()=>signOutStart({stockNames:stockNames})}>
+        <OptionLink as='div' onClick={()=>signOutStart({...userGraph,sql:sql})}>
           SIGN OUT
         </OptionLink>
       ) : (
@@ -45,12 +47,14 @@ const Header = ({ currentUser, hidden, signOutStart,stockNames}) => (
 
 const mapStateToProps = createStructuredSelector({
   currentUser: selectCurrentUser,
-  stockNames: selectStockNames
+  stockNames: selectStockNames,
+  userGraph: selectUserGraph,
+  sql: selectPgSql
 
 });
 
 const mapDispatchToProps = dispatch => ({
-  signOutStart: (stockName) => dispatch(signOutStart(stockName))
+  signOutStart: (useGraphs) => dispatch(signOutStart(useGraphs))
 });
 
 export default connect(

@@ -1,5 +1,6 @@
 import { takeLatest, put, all, call } from 'redux-saga/effects';
-
+import { selectUserGraph } from '../../redux/graph/graph.selectors'
+import { setUserGraph } from '../../redux/graph/graph.actions'
 import UserActionTypes from './user.types';
 
 import {
@@ -16,7 +17,8 @@ import {
   googleProvider,
   createUserProfileDocument,
   getCurrentUser,
-  addStockToFireStore
+  addStockToFireStore,
+  addGraphToFireStore
 } from '../../firebase/firebase.utils';
 
 export function* getSnapshotFromUserAuth(userAuth, additionalData) {
@@ -28,12 +30,6 @@ export function* getSnapshotFromUserAuth(userAuth, additionalData) {
     );
     const userSnapshot = yield userRef.get();
     yield put(signInSuccess({ id: userSnapshot.id, ...userSnapshot.data() }));
-    
-
-
-
-
-
   } catch (error) {
     yield put(signInFailure(error));
   }
@@ -85,11 +81,25 @@ export function* saveStocks({stockNames}){
 }
 
 
+export function* saveGraphs(userGraphs){
+  try{
+    const userAuth = yield getCurrentUser();
+  
+
+    if (!userAuth) return;
+    yield call(addGraphToFireStore,userAuth,userGraphs)
+
+  }catch(error){
+    console.log('error saving graphs')
+    console.log(error)
+  }
+}
 
 
 export function* signOut({payload}) {
   try {
-    yield saveStocks(payload)
+    // yield saveStocks(payload)
+    yield saveGraphs(payload)
     yield auth.signOut();
     yield put(signOutSuccess());
   } catch (error) {

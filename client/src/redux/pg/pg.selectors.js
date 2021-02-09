@@ -13,4 +13,9 @@ export const selectIsPgFetching = createSelector(
   data => data.isFetching
 );
 
+export const selectPgSql = createSelector(
+  [pg],
+  data => data.sql
+);
+
 
