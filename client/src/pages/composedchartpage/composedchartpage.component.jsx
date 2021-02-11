@@ -16,7 +16,7 @@ import 'react-date-range/dist/theme/default.css'; // theme css file
 import { DateRangePicker  } from 'react-date-range';
 import { formatDate } from '../../utils/inputs.utils'
 import { convertGraphDataForComposed, compareUnit } from '../../utils/graph.utils'
-import {getCurrentUser,loadGraphFromFireStore} from '../../firebase/firebase.utils'
+import { getCurrentUser,loadGraphFromFireStore } from '../../firebase/firebase.utils'
 
 
 
@@ -48,17 +48,20 @@ const ComposedChartPage = ({fetchPgStart,pg,isFetching,setUserGraph, userGraph, 
        //load graph
       const user = await getCurrentUser();
       const firebaseGraphs = await loadGraphFromFireStore(user)
-      console.log('----------------')
-      console.log(firebaseGraphs)
-      console.log('----------------')
-      
-      
-      
+   
       if(firebaseGraphs && !Array.isArray(firebaseGraphs)){
         for(let sql of firebaseGraphs.sql){
           await fetchPgStart({title: sql.title, query: sql.query, database: sql.database})
         }
-        setUserGraph(firebaseGraphs)
+
+        console.log(Object.keys(pg))
+        console.log(firebaseGraphs.sql.map(el=>el.title))
+        console.log(firebaseGraphs.sql)
+        setUserGraph({
+          composed: firebaseGraphs.composed,
+          pie: userGraph.pie,
+          versus: userGraph.versus
+        })
       }
       
         

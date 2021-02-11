@@ -11,9 +11,6 @@ const VersusChartComponent = function(props){
     const sensorNames = Object.keys(data);
     const COLORS = d3.schemePaired;
 
-    console.log(data)
-    console.log(sensorNames)
-
     return(
         <VersusChartContainer>
             {
@@ -37,7 +34,6 @@ const VersusChartComponent = function(props){
                                     <Legend />
                                     {
                                         Object.keys(data[entry]['data'][0]).filter((el)=>el !=='name').map((point,i)=>{
-                                            console.log(point)
                                             return <Bar key={i} dataKey= {point} stackId={index} fill={COLORS[i] } unit="%" />
                                         })
                                     }

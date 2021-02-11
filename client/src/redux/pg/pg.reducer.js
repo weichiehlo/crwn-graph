@@ -15,12 +15,15 @@ const pgReducer = (state = INITIAL_STATE, action) => {
           isFetching: true
         };
       case pgActionTypes.FETCH_PG_SUCCESS:
-        return {
-          ...state,
-          isFetching: false,
-          pg_data: {...state.pg_data,...action.payload.data},
-          sql: [...state.sql, action.payload.sql]
-        };
+        
+          return {
+            ...state,
+            isFetching: false,
+            pg_data: {...state.pg_data,...action.payload.data},
+            sql: [...state.sql, action.payload.sql]
+          };
+        
+        
       case pgActionTypes.FETCH_PG_FAILURE:
         return {
           ...state,

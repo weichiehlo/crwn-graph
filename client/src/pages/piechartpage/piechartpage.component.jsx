@@ -4,7 +4,7 @@ import { FormContainer, PieChartPageContainer, Warning} from './piechartpage.sty
 import { FormInput, FormSelect} from '../../components/form-input/form-input.component';
 import CustomButton from '../../components/custom-button/custom-button.component';
 import { fetchPgStart } from '../../redux/pg/pg.actions'
-import { selectPg, selectIsPgFetching } from '../../redux/pg/pg.selectors';
+import { selectPg, selectIsPgFetching, selectPgSql } from '../../redux/pg/pg.selectors';
 import { selectUserGraph } from '../../redux/graph/graph.selectors'
 import { setUserGraph } from '../../redux/graph/graph.actions'
 import { connect } from 'react-redux';
@@ -16,6 +16,7 @@ import 'react-date-range/dist/theme/default.css'; // theme css file
 import { DateRangePicker  } from 'react-date-range';
 import { formatDate } from '../../utils/inputs.utils'
 import { convertGraphDataForPie, compareUnit } from '../../utils/graph.utils'
+import { getCurrentUser,loadGraphFromFireStore } from '../../firebase/firebase.utils'
 
 
 
@@ -44,6 +45,20 @@ const PieChartPage = ({fetchPgStart,pg,isFetching,setUserGraph, userGraph}) => {
     const helper = async()=>{
        //fetch the name of the databases
        await fetchPgStart({title:'databaseModel', query:`SELECT datname FROM pg_database WHERE datname != 'template1' AND datname != 'template0' AND datname != 'postgres'`, database: ''})
+       //load graph
+        const user = await getCurrentUser();
+        const firebaseGraphs = await loadGraphFromFireStore(user)
+    
+        if(firebaseGraphs && !Array.isArray(firebaseGraphs)){
+          for(let sql of firebaseGraphs.sql){
+            await fetchPgStart({title: sql.title, query: sql.query, database: sql.database})
+          }
+          setUserGraph({
+            composed: userGraph.composed,
+            pie: firebaseGraphs.pie,
+            versus: userGraph.versus
+          })
+        }
     }
     helper();
   }, []);
@@ -341,7 +356,8 @@ const PieChartPage = ({fetchPgStart,pg,isFetching,setUserGraph, userGraph}) => {
 const mapStateToProps = createStructuredSelector({
   pg: selectPg,
   isFetching: selectIsPgFetching,
-  userGraph: selectUserGraph
+  userGraph: selectUserGraph,
+  sql: selectPgSql
 });
 
 const mapDispatchToProps = dispatch => ({
