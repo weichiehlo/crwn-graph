@@ -20,7 +20,7 @@ const pgReducer = (state = INITIAL_STATE, action) => {
             ...state,
             isFetching: false,
             pg_data: {...state.pg_data,...action.payload.data},
-            sql: [...state.sql, action.payload.sql]
+            sql: {...state.sql, ...action.payload.sql}
           };
         
         

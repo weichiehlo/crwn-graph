@@ -46,23 +46,25 @@ const ComposedChartPage = ({fetchPgStart,pg,isFetching,setUserGraph, userGraph, 
        //fetch the name of the databases
        await fetchPgStart({title:'databaseModel', query:`SELECT datname FROM pg_database WHERE datname != 'template1' AND datname != 'template0' AND datname != 'postgres'`, database: ''})
        //load graph
-      const user = await getCurrentUser();
-      const firebaseGraphs = await loadGraphFromFireStore(user)
-   
-      if(firebaseGraphs && !Array.isArray(firebaseGraphs)){
-        for(let sql of firebaseGraphs.sql){
-          await fetchPgStart({title: sql.title, query: sql.query, database: sql.database})
-        }
+       if(!Object.keys(userGraph.composed.graphData).length)
+      {
+        console.log('im i in')
+        const user = await getCurrentUser();
+        const firebaseGraphs = await loadGraphFromFireStore(user)
+    
+        if(firebaseGraphs && !Array.isArray(firebaseGraphs)){
+          for(let element in firebaseGraphs.sql){
+            await fetchPgStart({title: firebaseGraphs.sql[element].title, query: firebaseGraphs.sql[element].query, database: firebaseGraphs.sql[element].database})
+          }
 
-        console.log(Object.keys(pg))
-        console.log(firebaseGraphs.sql.map(el=>el.title))
-        console.log(firebaseGraphs.sql)
-        setUserGraph({
-          composed: firebaseGraphs.composed,
-          pie: userGraph.pie,
-          versus: userGraph.versus
-        })
-      }
+          setUserGraph({
+            composed: firebaseGraphs.composed,
+            pie: userGraph.pie,
+            versus: userGraph.versus
+          })
+        }
+    }
+      
       
         
       

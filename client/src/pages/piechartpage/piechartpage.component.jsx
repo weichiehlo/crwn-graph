@@ -46,12 +46,14 @@ const PieChartPage = ({fetchPgStart,pg,isFetching,setUserGraph, userGraph}) => {
        //fetch the name of the databases
        await fetchPgStart({title:'databaseModel', query:`SELECT datname FROM pg_database WHERE datname != 'template1' AND datname != 'template0' AND datname != 'postgres'`, database: ''})
        //load graph
+       if(!Object.keys(userGraph.pie.graphData).length)
+      {
         const user = await getCurrentUser();
         const firebaseGraphs = await loadGraphFromFireStore(user)
     
         if(firebaseGraphs && !Array.isArray(firebaseGraphs)){
-          for(let sql of firebaseGraphs.sql){
-            await fetchPgStart({title: sql.title, query: sql.query, database: sql.database})
+          for(let element in firebaseGraphs.sql){
+            await fetchPgStart({title: firebaseGraphs.sql[element].title, query: firebaseGraphs.sql[element].query, database: firebaseGraphs.sql[element].database})
           }
           setUserGraph({
             composed: userGraph.composed,
@@ -59,6 +61,7 @@ const PieChartPage = ({fetchPgStart,pg,isFetching,setUserGraph, userGraph}) => {
             versus: userGraph.versus
           })
         }
+      }
     }
     helper();
   }, []);
