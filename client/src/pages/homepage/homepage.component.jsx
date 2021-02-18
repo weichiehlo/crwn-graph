@@ -6,7 +6,7 @@ import { HomePageContainer,HomePageTitle } from './homepage.styles';
 
 const HomePage = () => (
     <HomePageContainer>
-      <HomePageTitle>Recommended Stocks</HomePageTitle>
+      <HomePageTitle>Data Analytics Platform</HomePageTitle>
       <Directory/>
     </HomePageContainer>
   );

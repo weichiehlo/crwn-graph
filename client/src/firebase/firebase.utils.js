@@ -43,50 +43,6 @@ export const createUserProfileDocument = async(userAuth, additionalData) => {
 firebase.initializeApp(config);
 
 
-export const addStockToFireStore = async (userAuth, stocks)=>{
-    if(!userAuth) return;
-    const userRef = firestore.doc(`stocks/${userAuth.uid}`)
-
-    stocks = {...{userId:userAuth.uid},...{stocks:stocks}}
-
-    const snapShot = await userRef.get()
-    if(!snapShot.exists){
-        try{
-            await userRef.set(stocks)
-
-        } catch(error){
-            console.log('error saving stocks', error.message)
-        }
-    }else{
-        try{
-            await userRef.set(stocks)
-
-        } catch(error){
-            console.log('error updating stocks', error.message)
-        }
-    }
-}
-
-export const loadStockFromFireStore= async(userAuth) =>{
-    if(!userAuth) return []
-    const stocksRef = firestore.collection('stocks');
-    const query = stocksRef.where("userId", "==", userAuth.uid);
-    const snapshot = await query.get()
-    const stockName = snapshot.docs.map(doc =>{
-        return doc.data()['stocks']
-    })
-    return stockName[0]
-    
-}
-
-
-export const loadStockNewsFromFireStore= async(stockName) =>{
-    const stocksRef = firestore.collection('stockNews').doc(stockName);
-    const snapshot = await stocksRef.get()
-    const stockNews = snapshot.data()
-    return stockNews.data
-}
-
 export const addCollectionAndDocuments = async (collectionKey, objectsToAdd) =>{
     const collectionRef = firestore.collection(collectionKey);
     
@@ -115,19 +71,6 @@ googleProvider.setCustomParameters({ prompt: 'select_account' });
 export const signInWithGoogle = () => auth.signInWithPopup(googleProvider)
 
 export default firebase;
-
-//this function is used for loading stock news to firebase because API request cost money.
-//https://stocknewsapi.com/
-// export const addStockNewsToFireStore = async (stockNews)=>{
-
-    
-//     const stockNewsRef =firestore.doc(`stockNews/${stockNews.data[0].tickers[0]}`)
-    
-//     // const stockNewsRef =firestore.collection("stockNews").doc()
-//     // to use for auto-generate document ID
-
-//     await stockNewsRef.set(stockNews)
-// }
 
 
 export const addGraphToFireStore = async (userAuth, graphs)=>{

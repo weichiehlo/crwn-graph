@@ -51,6 +51,7 @@ const VersusChartPage = ({fetchPgStart,pg,isFetching,setUserGraph, userGraph}) =
       {
         const user = await getCurrentUser();
         const firebaseGraphs = await loadGraphFromFireStore(user)
+
         if(firebaseGraphs && !Array.isArray(firebaseGraphs)){
           for(let element in firebaseGraphs.sql){
             await fetchPgStart({title: firebaseGraphs.sql[element].title, query: firebaseGraphs.sql[element].query, database: firebaseGraphs.sql[element].database})
@@ -162,7 +163,7 @@ const VersusChartPage = ({fetchPgStart,pg,isFetching,setUserGraph, userGraph}) =
 
   };
 
-  const handleGraph = (event) =>{
+  const handleGraph = async(event) =>{
 
     event.preventDefault(userGraph.versus['percision'])
 
@@ -177,10 +178,18 @@ const VersusChartPage = ({fetchPgStart,pg,isFetching,setUserGraph, userGraph}) =
     let convertedDataWithUnit = {}
 
     for(let table of userGraph.versus.selected){
-
-      xUnit = pg['databaseSensor'].find(el=>el['sensor_name'] === table.split(" vs ")[0].slice(7))['unit']
-      yUnit = pg['databaseSensor'].find(el=>el['sensor_name'] === table.split(" vs ")[1])['unit']
-      convertedDataWithUnit[table] = {'data':convertedData[table],'xUnit':xUnit,'yUnit':yUnit}
+      try {
+        xUnit = pg['databaseSensor'].find(el=>el['sensor_name'] === table.split(" vs ")[0].slice(7))['unit']
+        yUnit = pg['databaseSensor'].find(el=>el['sensor_name'] === table.split(" vs ")[1])['unit']
+        convertedDataWithUnit[table] = {'data':convertedData[table],'xUnit':xUnit,'yUnit':yUnit}
+      } catch{
+        await fetchPgStart({title:'databaseSensor', query:`SELECT * FROM "sensor_to_unit"`, database: table.slice(0,6)})
+        
+        xUnit = pg['databaseSensor'].find(el=>el['sensor_name'] === table.split(" vs ")[0].slice(7))['unit']
+        yUnit = pg['databaseSensor'].find(el=>el['sensor_name'] === table.split(" vs ")[1])['unit']
+        convertedDataWithUnit[table] = {'data':convertedData[table],'xUnit':xUnit,'yUnit':yUnit}
+      }
+      
     }
     setUserGraph({
       composed: userGraph.composed,
