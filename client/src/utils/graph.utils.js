@@ -297,20 +297,15 @@ export const convertGraphDataForVersus = (data,percision)=>{
    return processedData
 }
 
-export const compareUnit = (sensors,table)=>{
+export const compareUnit = (sensors)=>{
     
-    let unit = table.find(el=>el['sensor_name'] === sensors[0])['unit']
-    try{
-        for(let sensor of sensors){
-            if(table.find(el=>el['sensor_name'] === sensor)['unit']!== unit){
-                return false
-            }
+    let units = sensors.map(el=>el.slice(el.lastIndexOf('(')))
+    for(let i=1; i<units.length; i++){
+        if(units[i-1] !== units[i]){
+            return false
         }
-        
-        return true
-    }catch{
-        return false
     }
+    return true
     
 }
 

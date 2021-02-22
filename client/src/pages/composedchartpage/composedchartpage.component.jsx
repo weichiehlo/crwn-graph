@@ -48,7 +48,6 @@ const ComposedChartPage = ({fetchPgStart,pg,isFetching,setUserGraph, userGraph, 
        //load graph
        if(!Object.keys(userGraph.composed.graphData).length)
       {
-        console.log('im i in')
         const user = await getCurrentUser();
         const firebaseGraphs = await loadGraphFromFireStore(user)
     
@@ -63,14 +62,26 @@ const ComposedChartPage = ({fetchPgStart,pg,isFetching,setUserGraph, userGraph, 
             versus: userGraph.versus
           })
         }
-    }
-      
-      
-        
-      
       }
+    }
     helper();
   }, []);
+
+
+  useEffect(() => {
+
+    const loadSensorUnits = async()=>{
+     
+          for(let model of pg['databaseModel'].map(el=>el.datname).filter(el=>el.length===6)){
+            await fetchPgStart({title:`${model}_databaseSensor`, query:`SELECT * FROM "sensor_to_unit"`, database: model})
+          }
+    }
+    if(pg['databaseModel']) loadSensorUnits();
+     
+  }, [pg['databaseModel']]);
+
+
+
 
   useEffect(() => {
     let info = {};
@@ -103,8 +114,6 @@ const ComposedChartPage = ({fetchPgStart,pg,isFetching,setUserGraph, userGraph, 
   
   const handleSubmit = async event => {
     event.preventDefault();
-   
-    
     const {model,
     table,
     testType,
@@ -143,10 +152,6 @@ const ComposedChartPage = ({fetchPgStart,pg,isFetching,setUserGraph, userGraph, 
     const { name, value } = event.target? event.target:event;
     setgraphInfo({ ...graphInfo, [name]: value });
     switch(name){
-      case 'model':
-        if(graphInfo['table']) setgraphInfo({...initialState,'model':value});
-        await fetchPgStart({title:'databaseSensor', query:`SELECT * FROM "sensor_to_unit"`, database: value})
-        break;
       case 'table':
         await fetchPgStart({title:'databaseTestType', query:`SELECT DISTINCT (test_type) FROM "${value}"`, database: graphInfo['model']});
         await fetchPgStart({title:'databaseMinSN', query:`SELECT MIN (serial_number) FROM "${value}"`, database: graphInfo['model']});
@@ -164,15 +169,14 @@ const ComposedChartPage = ({fetchPgStart,pg,isFetching,setUserGraph, userGraph, 
 
     event.preventDefault()
     let raw = {};
-    
-    let unit = pg['databaseSensor'].find(el=>el['sensor_name'] === userGraph.composed.selected[0].slice(7))['unit']
+    let unit ;
     for(let table of userGraph.composed.selected){
-      unit = pg['databaseSensor'].find(el=>el['sensor_name'] === table.slice(7))['unit']
+      unit = pg[`${table.slice(0,6)}_databaseSensor`].find(el=>el['sensor_name'] === table.slice(7))['unit']
       raw[`${table} (${unit})`] = pg[table].map((el)=>({reading:el['reading'],serial_number:el['serial_number']}))
     }
 
     let graphData = convertGraphDataForComposed(raw,userGraph.composed['percision']);
-    if(compareUnit(userGraph.composed.selected.map(el=>el.slice(7)),pg['databaseSensor'])){
+    if(compareUnit(Object.keys(raw))){
       
       setUserGraph({
         composed: {...userGraph.composed,graphData:graphData.processeData,isSameUnit:true,serialNumber:graphData.serialNumber,average:graphData.average},
@@ -186,7 +190,7 @@ const ComposedChartPage = ({fetchPgStart,pg,isFetching,setUserGraph, userGraph, 
         versus: userGraph.versus
       })
     }
-
+    
   }
  
   
@@ -208,12 +212,12 @@ const ComposedChartPage = ({fetchPgStart,pg,isFetching,setUserGraph, userGraph, 
         graphInfo['model']?
           <div>
             {
-                pg['databaseSensor']?
+                pg[`${graphInfo['model']}_databaseSensor`]?
                 <FormSelect
                 label='Sensor'
                 placeholder=""
                 value={{value:graphInfo['table'],label:graphInfo['table']}}
-                options={pg['databaseSensor'].map((el)=>({value:el['sensor_name'],label:el['sensor_name']}))}
+                options={pg[`${graphInfo['model']}_databaseSensor`].map((el)=>({value:el['sensor_name'],label:el['sensor_name']}))}
                 onChange={(el)=>handleChange({...el,name:'table'})}
                 required
                 />

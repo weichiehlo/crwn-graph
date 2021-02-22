@@ -165,7 +165,7 @@ const PieChartPage = ({fetchPgStart,pg,isFetching,setUserGraph, userGraph}) => {
     }
 
     let graphData = convertGraphDataForPie(raw,userGraph.pie['percision']);
-    if(compareUnit(userGraph.pie.selected.map(el=>el.slice(7)),pg['databaseSensor'])){
+    if(compareUnit(Object.keys(raw))){
       setUserGraph({
         composed: userGraph.composed,
         pie: {...userGraph.pie,graphData:graphData.processeData,isSameUnit:true,serialNumber:graphData.serialNumber,average:graphData.average},
