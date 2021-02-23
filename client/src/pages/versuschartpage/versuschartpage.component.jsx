@@ -71,6 +71,18 @@ const VersusChartPage = ({fetchPgStart,pg,isFetching,setUserGraph, userGraph}) =
   }, []);
 
   useEffect(() => {
+
+    const loadSensorUnits = async()=>{
+     
+          for(let model of pg['databaseModel'].map(el=>el.datname).filter(el=>el.length===6)){
+            await fetchPgStart({title:`${model}_databaseSensor`, query:`SELECT * FROM "sensor_to_unit"`, database: model})
+          }
+    }
+    if(pg['databaseModel']) loadSensorUnits();
+     
+  }, [pg['databaseModel']]);
+
+  useEffect(() => {
     let info = {};
     if(graphInfo['xTable']|| graphInfo['yTable'])
     {
@@ -178,18 +190,9 @@ const VersusChartPage = ({fetchPgStart,pg,isFetching,setUserGraph, userGraph}) =
     let convertedDataWithUnit = {}
 
     for(let table of userGraph.versus.selected){
-      try {
-        xUnit = pg['databaseSensor'].find(el=>el['sensor_name'] === table.split(" vs ")[0].slice(7))['unit']
-        yUnit = pg['databaseSensor'].find(el=>el['sensor_name'] === table.split(" vs ")[1])['unit']
-        convertedDataWithUnit[table] = {'data':convertedData[table],'xUnit':xUnit,'yUnit':yUnit}
-      } catch{
-        await fetchPgStart({title:'databaseSensor', query:`SELECT * FROM "sensor_to_unit"`, database: table.slice(0,6)})
-        
-        xUnit = pg['databaseSensor'].find(el=>el['sensor_name'] === table.split(" vs ")[0].slice(7))['unit']
-        yUnit = pg['databaseSensor'].find(el=>el['sensor_name'] === table.split(" vs ")[1])['unit']
-        convertedDataWithUnit[table] = {'data':convertedData[table],'xUnit':xUnit,'yUnit':yUnit}
-      }
-      
+      xUnit = pg[`${table.slice(0,6)}_databaseSensor`].find(el=>el['sensor_name'] === table.split(" vs ")[0].slice(7))['unit']
+      yUnit = pg[`${table.slice(0,6)}_databaseSensor`].find(el=>el['sensor_name'] === table.split(" vs ")[1])['unit']
+      convertedDataWithUnit[table] = {'data':convertedData[table],'xUnit':xUnit,'yUnit':yUnit}
     }
     setUserGraph({
       composed: userGraph.composed,
@@ -220,13 +223,13 @@ const VersusChartPage = ({fetchPgStart,pg,isFetching,setUserGraph, userGraph}) =
         graphInfo['model']?
           <div>
             {
-                pg['databaseSensor']?
+              pg[`${graphInfo['model']}_databaseSensor`]?
                 <div>
                   <FormSelect
                   label='X Sensor'
                   placeholder=""
                   value={{value:graphInfo['xTable'],label:graphInfo['xTable']}}
-                  options={pg['databaseSensor'].map((el)=>({value:el['sensor_name'],label:el['sensor_name']}))}
+                  options={pg[`${graphInfo['model']}_databaseSensor`].map((el)=>({value:el['sensor_name'],label:el['sensor_name']}))}
                   onChange={(el)=>handleChange({...el,name:'xTable'})}
                   required
                   />
@@ -235,7 +238,7 @@ const VersusChartPage = ({fetchPgStart,pg,isFetching,setUserGraph, userGraph}) =
                   label='Y Sensor'
                   placeholder=""
                   value={{value:graphInfo['yTable'],label:graphInfo['yTable']}}
-                  options={pg['databaseSensor'].map((el)=>({value:el['sensor_name'],label:el['sensor_name']}))}
+                  options={pg[`${graphInfo['model']}_databaseSensor`].map((el)=>({value:el['sensor_name'],label:el['sensor_name']}))}
                   onChange={(el)=>handleChange({...el,name:'yTable'})}
                   required
                   />

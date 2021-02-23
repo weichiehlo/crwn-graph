@@ -67,6 +67,18 @@ const PieChartPage = ({fetchPgStart,pg,isFetching,setUserGraph, userGraph}) => {
   }, []);
 
   useEffect(() => {
+
+    const loadSensorUnits = async()=>{
+     
+          for(let model of pg['databaseModel'].map(el=>el.datname).filter(el=>el.length===6)){
+            await fetchPgStart({title:`${model}_databaseSensor`, query:`SELECT * FROM "sensor_to_unit"`, database: model})
+          }
+    }
+    if(pg['databaseModel']) loadSensorUnits();
+     
+  }, [pg['databaseModel']]);
+
+  useEffect(() => {
     let info = {};
     if(graphInfo['table'])
     {
@@ -138,10 +150,6 @@ const PieChartPage = ({fetchPgStart,pg,isFetching,setUserGraph, userGraph}) => {
     const { name, value } = event.target? event.target:event;
     setgraphInfo({ ...graphInfo, [name]: value });
     switch(name){
-      case 'model':
-        if(graphInfo['table']) setgraphInfo({...initialState,'model':value});
-        await fetchPgStart({title:'databaseSensor', query:`SELECT * FROM "sensor_to_unit"`, database: value})
-        break;
       case 'table':
         await fetchPgStart({title:'databaseTestType', query:`SELECT DISTINCT (test_type) FROM "${value}"`, database: graphInfo['model']});
         await fetchPgStart({title:'databaseMinSN', query:`SELECT MIN (serial_number) FROM "${value}"`, database: graphInfo['model']});
@@ -155,15 +163,18 @@ const PieChartPage = ({fetchPgStart,pg,isFetching,setUserGraph, userGraph}) => {
   };
 
   const handleGraph = (event) =>{
+
+    console.log(pg)
+
     event.preventDefault()
     let raw = {};
-    
-    let unit = pg['databaseSensor'].find(el=>el['sensor_name'] === userGraph.pie.selected[0].slice(7))['unit']
+    let unit ;
     for(let table of userGraph.pie.selected){
-      unit = pg['databaseSensor'].find(el=>el['sensor_name'] === table.slice(7))['unit']
+      unit = pg[`${table.slice(0,6)}_databaseSensor`].find(el=>el['sensor_name'] === table.slice(7))['unit']
+      console.log(unit)
       raw[`${table} (${unit})`] = pg[table].map((el)=>({reading:el['reading'],serial_number:el['serial_number']}))
     }
-
+    
     let graphData = convertGraphDataForPie(raw,userGraph.pie['percision']);
     if(compareUnit(Object.keys(raw))){
       setUserGraph({
@@ -204,12 +215,12 @@ const PieChartPage = ({fetchPgStart,pg,isFetching,setUserGraph, userGraph}) => {
         graphInfo['model']?
           <div>
             {
-                pg['databaseSensor']?
+                pg[`${graphInfo['model']}_databaseSensor`]?
                 <FormSelect
                 label='Sensor'
                 placeholder=""
                 value={{value:graphInfo['table'],label:graphInfo['table']}}
-                options={pg['databaseSensor'].map((el)=>({value:el['sensor_name'],label:el['sensor_name']}))}
+                options={pg[`${graphInfo['model']}_databaseSensor`].map((el)=>({value:el['sensor_name'],label:el['sensor_name']}))}
                 onChange={(el)=>handleChange({...el,name:'table'})}
                 required
                 />
