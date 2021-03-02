@@ -102,8 +102,13 @@ const ComposedChartPage = ({fetchPgStart,pg,isFetching,setUserGraph, userGraph, 
         info = {...info, 'range': temp};
       }
       if(pg['databaseMaxDate']){
+          Date.prototype.addDays = function(days) {
+          var date = new Date(this.valueOf());
+          date.setDate(date.getDate() + days);
+          return date;
+      }
         let temp = graphInfo['range'];
-        temp[0]['endDate'] = new Date(pg['databaseMaxDate'][0]['max']);
+        temp[0]['endDate'] = new Date(pg['databaseMaxDate'][0]['max']).addDays(1);
         info = {...info, 'range':  temp};
       }
     }

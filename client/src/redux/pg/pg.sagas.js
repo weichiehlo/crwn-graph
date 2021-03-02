@@ -18,7 +18,6 @@ export function* fetchPgAsync({payload}) {
       method: 'post', 
       data: { query: query,
               database: database}});
-
     yield put(fetchPgSuccess({data:{[title]:response.data},sql:{[title]:payload}}));
 
   } catch (error) {

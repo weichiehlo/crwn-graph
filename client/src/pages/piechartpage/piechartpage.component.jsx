@@ -97,10 +97,15 @@ const PieChartPage = ({fetchPgStart,pg,isFetching,setUserGraph, userGraph}) => {
         info = {...info, 'range': temp};
       }
       if(pg['databaseMaxDate']){
-        let temp = graphInfo['range'];
-        temp[0]['endDate'] = new Date(pg['databaseMaxDate'][0]['max']);
-        info = {...info, 'range':  temp};
-      }
+        Date.prototype.addDays = function(days) {
+        var date = new Date(this.valueOf());
+        date.setDate(date.getDate() + days);
+        return date;
+    }
+      let temp = graphInfo['range'];
+      temp[0]['endDate'] = new Date(pg['databaseMaxDate'][0]['max']).addDays(1);
+      info = {...info, 'range':  temp};
+    }
     }
     
     setgraphInfo({ ...graphInfo, ...info });
