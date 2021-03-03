@@ -18,3 +18,27 @@ export const ComposedChartPageContainer = styled.div`
 export const Warning = styled.div`
   color: red;
 `;
+
+export const Title = styled.h1`
+  color:gray;
+  font-size:50px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items:center;
+`;
+
+export const Description = styled.p`
+  color:gray;
+  font-size:35px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 10px 20px;
+  align-items:center;
+  border-radius: 25px;
+  gap: 12px;
+`;
+
+
+

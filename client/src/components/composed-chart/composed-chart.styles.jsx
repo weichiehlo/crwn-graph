@@ -18,6 +18,7 @@ export const Title = styled.h1`
   margin-bottom: 50px;
 `;
 
+
 export const RevealContainer = styled.div`
  display: flex;
  flex-direction: row;

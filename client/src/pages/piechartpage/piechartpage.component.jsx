@@ -1,6 +1,6 @@
 import React, {useState,useEffect} from 'react';
 import PieChartComponent from '../../components/pie-chart/pie-chart.component'
-import { FormContainer, PieChartPageContainer, Warning} from './piechartpage.styles'
+import { FormContainer, PieChartPageContainer, Warning, Description, Title} from './piechartpage.styles'
 import { FormInput, FormSelect} from '../../components/form-input/form-input.component';
 import CustomButton from '../../components/custom-button/custom-button.component';
 import { fetchPgStart } from '../../redux/pg/pg.actions'
@@ -153,8 +153,27 @@ const PieChartPage = ({fetchPgStart,pg,isFetching,setUserGraph, userGraph}) => {
 
   const handleChange = async(event) => {
     const { name, value } = event.target? event.target:event;
+
     setgraphInfo({ ...graphInfo, [name]: value });
+
+    
+
     switch(name){
+      case 'model':
+        setgraphInfo({
+          model: value,
+          table: '',
+          testType: [],
+          lowerSN: '',
+          upperSN: '',
+          range:[{
+            startDate: '',
+            endDate: '',
+            key: 'selection'
+          }]
+        })
+        break
+      
       case 'table':
         await fetchPgStart({title:'databaseTestType', query:`SELECT DISTINCT (test_type) FROM "${value}"`, database: graphInfo['model']});
         await fetchPgStart({title:'databaseMinSN', query:`SELECT MIN (serial_number) FROM "${value}"`, database: graphInfo['model']});
@@ -195,15 +214,15 @@ const PieChartPage = ({fetchPgStart,pg,isFetching,setUserGraph, userGraph}) => {
       })
     }
 
-
-    
-
-
   }
  
   
   return (
     <PieChartPageContainer>
+      <Title> PIE CHART</Title>
+      <Description>
+        Pie chart excels at displaying the distribution of 1 sensor.
+      </Description>
       <FormContainer onSubmit={handleSubmit}>
         {pg['databaseModel']?
           <FormSelect
@@ -280,7 +299,7 @@ const PieChartPage = ({fetchPgStart,pg,isFetching,setUserGraph, userGraph}) => {
             
           </div>
           :
-          <div/>    
+          <div/>   
           }
       
       {

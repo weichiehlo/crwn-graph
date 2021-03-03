@@ -1,6 +1,6 @@
 import React, {useState,useEffect} from 'react';
 import ComposedChartComponent from '../../components/composed-chart/composed-chart.component'
-import { FormContainer, ComposedChartPageContainer, Warning} from './composedchartpage.styles'
+import { FormContainer, ComposedChartPageContainer, Warning, Description, Title} from './composedchartpage.styles'
 import { FormInput, FormSelect} from '../../components/form-input/form-input.component';
 import CustomButton from '../../components/custom-button/custom-button.component';
 import { fetchPgStart } from '../../redux/pg/pg.actions'
@@ -157,6 +157,21 @@ const ComposedChartPage = ({fetchPgStart,pg,isFetching,setUserGraph, userGraph, 
     const { name, value } = event.target? event.target:event;
     setgraphInfo({ ...graphInfo, [name]: value });
     switch(name){
+      case 'model':
+        setgraphInfo({
+          model: value,
+          table: '',
+          testType: [],
+          lowerSN: '',
+          upperSN: '',
+          range:[{
+            startDate: '',
+            endDate: '',
+            key: 'selection'
+          }]
+        })
+        break
+        
       case 'table':
         await fetchPgStart({title:'databaseTestType', query:`SELECT DISTINCT (test_type) FROM "${value}"`, database: graphInfo['model']});
         await fetchPgStart({title:'databaseMinSN', query:`SELECT MIN (serial_number) FROM "${value}"`, database: graphInfo['model']});
@@ -200,6 +215,10 @@ const ComposedChartPage = ({fetchPgStart,pg,isFetching,setUserGraph, userGraph, 
   
   return (
     <ComposedChartPageContainer>
+      <Title> COMPOSED CHART</Title>
+      <Description>
+        Composed chart excels at comparing the sensors that has the same unit, and see how the readings are distributed.
+      </Description>
       <FormContainer onSubmit={handleSubmit}>
         { pg['databaseModel']?
           <FormSelect

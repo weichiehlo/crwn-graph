@@ -1,37 +1,22 @@
 const INITIAL_STATE = {
   sections: [
     {
-      title: 'Fortinet',
-      imageUrl: 'https://i.ytimg.com/vi/We4MQrjySHw/maxresdefault.jpg',
+      title: 'Composed Chart',
+      imageUrl: 'https://screenshots.imgix.net/recharts/recharts/composed-chart/1.6.2/5cebdcd93ebea5001b26cd28/293dab6f-78ae-4630-a7c2-b80f49df06c9.png',
       id: 1,
-      linkUrl: 'https://finance.yahoo.com/quote/FTNT/'
-    },
-    {
-      title: 'Nvidia',
-      imageUrl: 'https://s3.amazonaws.com/cms.ipressroom.com/219/files/20149/543c131bfe058b228e020181_slide1/slide1_mid.jpg',
+      linkUrl: 'composedchart'
+    },{
+      title: 'Pie Chart',
+      imageUrl: 'https://spark.adobe.com/sprout/api/images/978c76de-15ac-4f1f-8a13-55cda19813e0',
       id: 2,
-      linkUrl: 'https://finance.yahoo.com/quote/NVDA/'
+      linkUrl: 'piechart'
     },
     {
-      title: 'Jets',
-      imageUrl: 'https://ei.marketwatch.com/Multimedia/2019/02/25/Photos/ZQ/MW-HE536_airpla_20190225131547_ZQ.jpg?uuid=5fa81d1a-3929-11e9-9462-ac162d7bc1f7',
+      title: 'Versus Chart',
+      imageUrl: 'https://lh3.googleusercontent.com/-QiDIuklSBM2J3jZRbzt-byWdz_QKcSYceCLanKLHgITAxpDj_dBN-fdW-Ijx1-Kzg=w600-rwa',
       id: 3,
-      linkUrl: 'https://finance.yahoo.com/quote/JETS/'
+      linkUrl: 'versuschart'
     },
-    {
-      title: 'Spotify',
-      imageUrl: 'https://www.scdn.co/i/_global/open-graph-default.png',
-      size: 'large',
-      id: 4,
-      linkUrl: 'https://finance.yahoo.com/quote/SPOT/'
-    },
-    {
-      title: 'Micron',
-      imageUrl: 'https://static.seekingalpha.com/uploads/2019/12/9/36303466-1575904412430061.png',
-      size: 'large',
-      id: 5,
-      linkUrl: 'https://finance.yahoo.com/quote/MU/'
-    }
   ]
 };
 

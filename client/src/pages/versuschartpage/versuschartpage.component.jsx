@@ -1,6 +1,6 @@
 import React, {useState,useEffect} from 'react';
 import VersusChartComponent from '../../components/versus-chart/versus-chart.component'
-import { FormContainer, VersusChartPageContainer, Warning} from './versuschartpage.styles'
+import { FormContainer, VersusChartPageContainer, Warning, Description, Title} from './versuschartpage.styles'
 import { FormInput, FormSelect} from '../../components/form-input/form-input.component';
 import CustomButton from '../../components/custom-button/custom-button.component';
 import { fetchPgStart } from '../../redux/pg/pg.actions'
@@ -212,6 +212,10 @@ const VersusChartPage = ({fetchPgStart,pg,isFetching,setUserGraph, userGraph}) =
   
   return (
     <VersusChartPageContainer>
+    <Title>Versus CHART</Title>
+      <Description>
+        Versus chart shows the relationship between 2 sensors and how they are distributed.
+      </Description>
       <FormContainer onSubmit={handleSubmit}>
         {pg['databaseModel']?
           <FormSelect
