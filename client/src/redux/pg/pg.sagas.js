@@ -14,7 +14,7 @@ export function* fetchPgAsync({payload}) {
   const {title, query, database} = payload
   try {
     const response = yield axios({
-      url:'query',
+      url:'http://localhost:5000/query',
       method: 'post', 
       data: { query: query,
               database: database}});
