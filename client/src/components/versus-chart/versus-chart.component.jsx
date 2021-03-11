@@ -1,7 +1,6 @@
 import React from 'react'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 import { VersusChartContainer, Title, XChartContainer, YChartContainer} from './versus-chart.styles'
-import * as d3 from 'd3-scale-chromatic'
 
 
 
@@ -9,7 +8,17 @@ const VersusChartComponent = function(props){
 
     let {data} = props
     const sensorNames = Object.keys(data);
-    const COLORS = d3.schemePaired;
+    const COLORS = [
+    "#422f83",
+    "#3888f9",
+    "#5efc74",
+    "#9ff84b",
+    "#c1ed3d",
+    "#f5c72b",
+    "#ffad25",
+    "#ff721b",
+    "#d5380f",
+    "#910c00",];
 
     return(
         <VersusChartContainer>

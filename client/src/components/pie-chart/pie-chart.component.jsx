@@ -1,10 +1,9 @@
 import React, {useState} from 'react'
-import { Area, Bar, ComposedChart, Line, CartesianGrid, XAxis, YAxis,Tooltip,Legend,Scatter,PieChart, Pie, Cell, Sector  } from 'recharts';
+import { PieChart, Pie, Cell, Sector  } from 'recharts';
 import { PieChartContainer, Title, RevealContainer,ChartSNContainer, ChartRevealContainer, ChartInfoContainer, GraphTitle, Average, SinglePieContainer, GraphContainer} from './pie-chart.styles'
 import { getChartColor } from '../../utils/graph.utils'
 import  CoordinateInfo  from '../coordinate-info/coordinate-info.component'
 import Checkbox from 'rc-checkbox';
-import * as d3 from 'd3-scale-chromatic'
 
 
 const PieChartComponent = function(props){
@@ -30,11 +29,21 @@ const PieChartComponent = function(props){
     }
 
     //Pie Calculation
-    const COLORS = d3.schemePaired ;
+    const COLORS = [
+        "#422f83",
+        "#3888f9",
+        "#5efc74",
+        "#9ff84b",
+        "#c1ed3d",
+        "#f5c72b",
+        "#ffad25",
+        "#ff721b",
+        "#d5380f",
+        "#910c00",];
     const RADIAN = Math.PI / 180;
 
     const renderCustomizedLabel = (props) => {
-    const { cx, cy, midAngle, innerRadius, outerRadius, percent, index, name } = props
+    const { cx, cy, midAngle, innerRadius, outerRadius, percent, name } = props
     const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
      const x  = cx + radius * Math.cos(-midAngle * RADIAN);
      const y = cy  + radius * Math.sin(-midAngle * RADIAN);

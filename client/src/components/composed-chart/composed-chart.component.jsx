@@ -1,5 +1,5 @@
 import React, {useState} from 'react'
-import { Area, Bar, ComposedChart, Line, CartesianGrid, XAxis, YAxis,Tooltip,Legend,Scatter, ReferenceLine  } from 'recharts';
+import { Area, Bar, ComposedChart, Line, CartesianGrid, XAxis, YAxis,Tooltip,Legend,Scatter } from 'recharts';
 import { ComposedChartContainer, Title, RevealContainer,ChartSNContainer, ChartRevealContainer, ChartInfoContainer, AverageContainer, Average} from './composed-chart.styles'
 import { getChartColor } from '../../utils/graph.utils'
 import  CoordinateInfo  from '../coordinate-info/coordinate-info.component'

@@ -68,6 +68,7 @@ const VersusChartPage = ({fetchPgStart,pg,isFetching,setUserGraph, userGraph}) =
       
       }
     helper();
+    // eslint-disable-next-line
   }, []);
 
   useEffect(() => {
@@ -79,7 +80,7 @@ const VersusChartPage = ({fetchPgStart,pg,isFetching,setUserGraph, userGraph}) =
           }
     }
     if(pg['databaseModel']) loadSensorUnits();
-     
+    // eslint-disable-next-line
   }, [pg['databaseModel']]);
 
   useEffect(() => {
@@ -101,6 +102,7 @@ const VersusChartPage = ({fetchPgStart,pg,isFetching,setUserGraph, userGraph}) =
         info = {...info, 'range': temp};
       }
       if(pg['databaseMaxDate']){
+        // eslint-disable-next-line
         Date.prototype.addDays = function(days) {
         var date = new Date(this.valueOf());
         date.setDate(date.getDate() + days);
@@ -113,7 +115,7 @@ const VersusChartPage = ({fetchPgStart,pg,isFetching,setUserGraph, userGraph}) =
     }
     
     setgraphInfo({ ...graphInfo, ...info });
-     
+     // eslint-disable-next-line
   }, [pg]);
   
   const handleSubmit = async event => {
