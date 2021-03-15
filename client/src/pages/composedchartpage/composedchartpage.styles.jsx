@@ -41,4 +41,10 @@ export const Description = styled.p`
 `;
 
 
+export const ComposedChartGraphButtonsContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  gap: 30px;
+`;
+
 

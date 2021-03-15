@@ -1,6 +1,6 @@
 import React, {useState,useEffect} from 'react';
 import ComposedChartComponent from '../../components/composed-chart/composed-chart.component'
-import { FormContainer, ComposedChartPageContainer, Warning, Description, Title} from './composedchartpage.styles'
+import { FormContainer, ComposedChartPageContainer, Warning, Description, Title, ComposedChartGraphButtonsContainer} from './composedchartpage.styles'
 import { FormInput, FormSelect} from '../../components/form-input/form-input.component';
 import CustomButton from '../../components/custom-button/custom-button.component';
 import { fetchPgStart } from '../../redux/pg/pg.actions'
@@ -213,6 +213,20 @@ const ComposedChartPage = ({fetchPgStart,pg,isFetching,setUserGraph, userGraph, 
     }
     
   }
+
+  const handleGrapgDelete = () =>{
+
+    let all = userGraph.composed.all;
+    for(let table of userGraph.composed.selected){
+      all.splice(all.indexOf(table),1);
+    }
+
+    setUserGraph({
+      composed: {...userGraph.composed,all:all,selected:[],graphData:[]},
+      pie: userGraph.pie,
+      versus: userGraph.versus
+    })
+  }
  
   
   return (
@@ -364,7 +378,17 @@ const ComposedChartPage = ({fetchPgStart,pg,isFetching,setUserGraph, userGraph, 
                   />
           {
             userGraph.composed.selected.length && ! isFetching?
+            <ComposedChartGraphButtonsContainer>
             <CustomButton>Graph Selected</CustomButton>
+            <CustomButton
+              type='button'
+              onClick={() => { if (window.confirm('Are you sure you wish to delete selected table(s)?')) handleGrapgDelete() }}
+              isDeleteWarning
+              >
+              DELETE SELECTED
+            </CustomButton>
+            </ComposedChartGraphButtonsContainer>
+              
             :
             <div/>
           }

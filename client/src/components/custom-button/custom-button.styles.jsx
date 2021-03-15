@@ -34,9 +34,22 @@ const googleSignInStyles = css`
   }
 `;
 
+const deleteWarningStyles = css`
+  background-color: #B33A3A;
+  color: white;
+
+  &:hover {
+    background-color: #800000;
+    border: none;
+  }
+`;
+
 const getButtonStyles = props => {
   if (props.isGoogleSignIn) {
     return googleSignInStyles;
+  }
+  if(props.isDeleteWarning) {
+    return deleteWarningStyles;
   }
 
   return props.inverted ? invertedButtonStyles : buttonStyles;
