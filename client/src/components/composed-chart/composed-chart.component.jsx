@@ -39,7 +39,7 @@ const ComposedChartComponent = function(props){
                     >
                     <CartesianGrid stroke="#f5f5f5" />
                     <XAxis dataKey="name" />
-                    <YAxis />
+                    <YAxis type="number" domain={[0, 100]}/>
                     <Tooltip/>
                     <Legend />
                     {

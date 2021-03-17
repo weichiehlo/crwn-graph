@@ -8,7 +8,7 @@ import { selectPgSql } from '../../redux/pg/pg.selectors';
 import { signOutStart } from '../../redux/user/user.actions';
 
 
-import { ReactComponent as Logo } from '../../assets/crown.svg';
+import { ReactComponent as Logo } from '../../assets/fortinetLogo.svg';
 
 import {
   HeaderContainer,

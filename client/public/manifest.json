@@ -1,6 +1,6 @@
 {
-  "short_name": "Crwn-Clothing",
-  "name": "Crwn-Clothing by Andy",
+  "short_name": "Fortinet-Graphing-Platform",
+  "name": "Fortinet-Graphing-Platform by Andy",
   "icons": [
     {
       "src": "favicon.ico",
@@ -9,14 +9,14 @@
       "purpose": "any maskable"
     },
     {
-      "src": "crwn-512x512.png",
+      "src": "android-icon-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
       
     },
     {
-      "src": "crwn-192x192.png",
+      "src": "android-icon-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
