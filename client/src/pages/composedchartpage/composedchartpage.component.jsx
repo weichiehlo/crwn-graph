@@ -147,7 +147,7 @@ const ComposedChartPage = ({fetchPgStart,pg,isFetching,setUserGraph, userGraph, 
     database: model})
     
     setUserGraph({
-      composed: {...userGraph.composed,all:[...userGraph.composed.all,tableName]},
+      composed: {...userGraph.composed,all:[...new Set([...userGraph.composed.all,tableName])]},
       pie: userGraph.pie,
       versus: userGraph.versus
     })

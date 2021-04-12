@@ -38,3 +38,9 @@ export const Description = styled.p`
   border-radius: 25px;
   gap: 12px;
 `;
+
+export const ComposedChartGraphButtonsContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  gap: 30px;
+`;

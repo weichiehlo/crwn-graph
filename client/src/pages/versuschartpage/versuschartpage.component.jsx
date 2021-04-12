@@ -1,6 +1,6 @@
 import React, {useState,useEffect} from 'react';
 import VersusChartComponent from '../../components/versus-chart/versus-chart.component'
-import { FormContainer, VersusChartPageContainer, Warning, Description, Title} from './versuschartpage.styles'
+import { FormContainer, VersusChartPageContainer, Warning, Description, Title, ComposedChartGraphButtonsContainer} from './versuschartpage.styles'
 import { FormInput, FormSelect} from '../../components/form-input/form-input.component';
 import CustomButton from '../../components/custom-button/custom-button.component';
 import { fetchPgStart } from '../../redux/pg/pg.actions'
@@ -155,7 +155,7 @@ const VersusChartPage = ({fetchPgStart,pg,isFetching,setUserGraph, userGraph}) =
     setUserGraph({
       composed: userGraph.composed,
       pie: userGraph.pie,
-      versus: {...userGraph.versus,all:[...userGraph.versus.all,tableName]}
+      versus: {...userGraph.versus,all:[...new Set([...userGraph.versus.all,tableName])]}
     })
     
   };
@@ -206,9 +206,21 @@ const VersusChartPage = ({fetchPgStart,pg,isFetching,setUserGraph, userGraph}) =
       pie: userGraph.pie,
       versus: {...userGraph.versus,graphData:convertedDataWithUnit}
     })
-
-    console.log(convertedDataWithUnit)
     
+  }
+
+  const handleGrapgDelete = () =>{
+
+    let all = userGraph.versus.all;
+    for(let table of userGraph.versus.selected){
+      all.splice(all.indexOf(table),1);
+    }
+
+    setUserGraph({
+      composed: userGraph.composed,
+      pie: userGraph.pie,
+      versus: {...userGraph.versus,all:all,selected:[],graphData:[]}
+    })
   }
  
   
@@ -366,7 +378,16 @@ const VersusChartPage = ({fetchPgStart,pg,isFetching,setUserGraph, userGraph}) =
                   />
           {
             userGraph.versus.selected.length && ! isFetching?
-            <CustomButton>Graph Selected</CustomButton>
+            <ComposedChartGraphButtonsContainer>
+             <CustomButton>Graph Selected</CustomButton>
+              <CustomButton
+                type='button'
+                onClick={() => { if (window.confirm('Are you sure you wish to delete selected table(s)?')) handleGrapgDelete() }}
+                isDeleteWarning
+                >
+                DELETE SELECTED
+              </CustomButton>
+            </ComposedChartGraphButtonsContainer>
             :
             <div/>
           }

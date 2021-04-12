@@ -1,6 +1,6 @@
 import React, {useState,useEffect} from 'react';
 import PieChartComponent from '../../components/pie-chart/pie-chart.component'
-import { FormContainer, PieChartPageContainer, Warning, Description, Title} from './piechartpage.styles'
+import { FormContainer, PieChartPageContainer, Warning, Description, Title, ComposedChartGraphButtonsContainer} from './piechartpage.styles'
 import { FormInput, FormSelect} from '../../components/form-input/form-input.component';
 import CustomButton from '../../components/custom-button/custom-button.component';
 import { fetchPgStart } from '../../redux/pg/pg.actions'
@@ -147,7 +147,7 @@ const PieChartPage = ({fetchPgStart,pg,isFetching,setUserGraph, userGraph}) => {
     database: model})
     setUserGraph({
       composed: userGraph.composed,
-      pie: {...userGraph.pie,all:[...userGraph.pie.all,tableName]},
+      pie: {...userGraph.pie,all:[...new Set([...userGraph.pie.all,tableName])]},
       versus: userGraph.versus
     })
     
@@ -188,8 +188,6 @@ const PieChartPage = ({fetchPgStart,pg,isFetching,setUserGraph, userGraph}) => {
 
   const handleGraph = (event) =>{
 
-    console.log(pg)
-
     event.preventDefault()
     let raw = {};
     let unit ;
@@ -214,6 +212,20 @@ const PieChartPage = ({fetchPgStart,pg,isFetching,setUserGraph, userGraph}) => {
       })
     }
 
+  }
+
+  const handleGrapgDelete = () =>{
+
+    let all = userGraph.pie.all;
+    for(let table of userGraph.pie.selected){
+      all.splice(all.indexOf(table),1);
+    }
+
+    setUserGraph({
+      composed: userGraph.composed,
+      pie: {...userGraph.pie,all:all,selected:[],graphData:[]},
+      versus: userGraph.versus
+    })
   }
  
   
@@ -313,7 +325,7 @@ const PieChartPage = ({fetchPgStart,pg,isFetching,setUserGraph, userGraph}) => {
       }
       </FormContainer>
       {
-        userGraph.pie['all'].length?
+        userGraph.pie['all'] && userGraph.pie['all'].length?
         <FormContainer onSubmit={handleGraph}>
           <FormSelect
                   label='User Tables'
@@ -363,7 +375,16 @@ const PieChartPage = ({fetchPgStart,pg,isFetching,setUserGraph, userGraph}) => {
                   />
           {
             userGraph.pie.selected.length && ! isFetching?
-            <CustomButton>Graph Selected</CustomButton>
+            <ComposedChartGraphButtonsContainer>
+              <CustomButton>Graph Selected</CustomButton>
+              <CustomButton
+                type='button'
+                onClick={() => { if (window.confirm('Are you sure you wish to delete selected table(s)?')) handleGrapgDelete() }}
+                isDeleteWarning
+                >
+                DELETE SELECTED
+              </CustomButton>
+            </ComposedChartGraphButtonsContainer>
             :
             <div/>
           }

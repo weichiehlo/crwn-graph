@@ -80,6 +80,41 @@ export function* saveGraphs(userGraphs){
 
 export function* signOut({payload}) {
   try {
+
+    //process save data
+
+    if(!payload.composed.all.length){
+      payload.composed = {
+        all:[],
+        selected:[],
+        graphData:[],
+        serialNumber:{},
+        average:{},
+        percision:3,
+        type:'Area',
+        isSameUnit:true};
+    }
+    if(!payload.pie.all.length){
+      payload.pie = {
+        all:[],
+        selected:[],
+        graphData:{},
+        serialNumber:{},
+        average:{},
+        percision:3,
+        type:'Pie(Simple)',
+        isSameUnit:true};
+    }
+    if(!payload.versus.all.length){
+      payload.versus = {
+        all:[],
+        selected:[],
+        graphData:{},
+        percision:3};
+    }
+
+
+
     yield saveGraphs(payload)
     yield auth.signOut();
     yield put(signOutSuccess());
