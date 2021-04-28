@@ -27,6 +27,7 @@ const Header = ({ currentUser, hidden, signOutStart,userGraph, sql}) => (
       <OptionLink to='/composedchart'>COMPOSED CHART</OptionLink>
       <OptionLink to='/piechart'>PIE CHART</OptionLink>
       <OptionLink to='/versuschart'>VERSUS CHART</OptionLink>
+      <OptionLink to='/blacklist'>Blacklist CHART</OptionLink>
     </PagesNavContainer>
     <OptionsContainer>
       <OptionLink to='/contact'>CONTACT</OptionLink>

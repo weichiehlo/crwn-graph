@@ -15,6 +15,7 @@ const HomePage = lazy(()=>import('./pages/homepage/homepage.component'));
 const SignInAndSignUpPage = lazy(()=>import('./pages/sign-in-and-sign-up/sign-in-and-sign-up.component'));
 const ContactPage = lazy(()=>import('./pages/contactpage/contact.component.jsx'));
 const ComposedChartPage = lazy(()=>import('./pages/composedchartpage/composedchartpage.component'))
+const BlackListPage = lazy(()=>import('./pages/black-list-page/black-list-page.component'))
 const PieChartPage = lazy(()=>import('./pages/piechartpage/piechartpage.component'))
 const VersusChartPage = lazy(()=>import('./pages/versuschartpage/versuschartpage.component'))
 
@@ -32,6 +33,7 @@ const App = ({ checkUserSession, currentUser }) => {
           <Suspense fallback={<Spinner/>}>
               <Route exact path='/' component={HomePage} />
               <Route path='/composedchart' component={ComposedChartPage} />
+              <Route path='/blacklist' component={BlackListPage} />
               <Route path='/contact' component={ContactPage} />
               <Route path='/piechart' component={PieChartPage}/>
               <Route path='/versuschart' component={VersusChartPage}/>
