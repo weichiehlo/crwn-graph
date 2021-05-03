@@ -16,6 +16,7 @@ import 'react-date-range/dist/theme/default.css'; // theme css file
 import { DateRangePicker  } from 'react-date-range';
 import { formatDate } from '../../utils/inputs.utils'
 import { convertGraphDataForComposed } from '../../utils/graph.utils'
+import { getCurrentUser,loadGraphFromFireStore } from '../../firebase/firebase.utils'
 
 
 
@@ -44,7 +45,26 @@ const ComposedChartPage = ({fetchPgStart,pg,isFetching,setUserGraph, userGraph, 
     const helper = async()=>{
        //fetch the name of the databases
        await fetchPgStart({title:'databaseModel', query:`SELECT datname FROM pg_database WHERE datname != 'template1' AND datname != 'template0' AND datname != 'postgres'`, database: ''})
-    }
+        //load graph
+        if(!Object.keys(userGraph.blacklist.graphData).length)
+        {
+          const user = await getCurrentUser();
+          const firebaseGraphs = await loadGraphFromFireStore(user)
+      
+          if(firebaseGraphs && !Array.isArray(firebaseGraphs)){
+            for(let element in firebaseGraphs.sql){
+              await fetchPgStart({title: firebaseGraphs.sql[element].title, query: firebaseGraphs.sql[element].query, database: firebaseGraphs.sql[element].database})
+            }
+  
+            setUserGraph({
+              composed: userGraph.composed,
+              pie: userGraph.pie,
+              versus: userGraph.versus,
+              blacklist: firebaseGraphs.blacklist
+            })
+          }
+        }
+      }
     helper();
     // eslint-disable-next-line
   }, []);
@@ -116,12 +136,16 @@ const ComposedChartPage = ({fetchPgStart,pg,isFetching,setUserGraph, userGraph, 
     AND serial_number >= '${lowerSN}' AND serial_number <= '${upperSN}' 
     ${testTypeString} ORDER BY reading`,
     database: model})
+
     
     setUserGraph({
-      composed: {...userGraph.composed,all:[...new Set([...userGraph.composed.all,tableName])]},
+      composed: userGraph.composed,
       pie: userGraph.pie,
-      versus: userGraph.versus
+      versus: userGraph.versus,
+      blacklist: {...userGraph.blacklist,all:[...new Set([...userGraph.blacklist.all,tableName])]}
     })
+
+    
     
   };
 
@@ -164,7 +188,7 @@ const ComposedChartPage = ({fetchPgStart,pg,isFetching,setUserGraph, userGraph, 
 
     event.preventDefault()
     let raw = {};
-    for(let table of userGraph.composed.selected){
+    for(let table of userGraph.blacklist.selected){
       console.log(table)
     }
 
@@ -183,15 +207,16 @@ const ComposedChartPage = ({fetchPgStart,pg,isFetching,setUserGraph, userGraph, 
 
   const handleGrapgDelete = () =>{
 
-    let all = userGraph.composed.all;
-    for(let table of userGraph.composed.selected){
+    let all = userGraph.blacklist.all;
+    for(let table of userGraph.blacklist.selected){
       all.splice(all.indexOf(table),1);
     }
 
     setUserGraph({
-      composed: {...userGraph.composed,all:all,selected:[],graphData:[]},
+      composed: userGraph.composed,
       pie: userGraph.pie,
-      versus: userGraph.versus
+      versus: userGraph.versus,
+      blacklist: {...userGraph.blacklist,all:all,selected:[],graphData:[]}
     })
   }
  
@@ -295,37 +320,26 @@ const ComposedChartPage = ({fetchPgStart,pg,isFetching,setUserGraph, userGraph, 
 
       
       {
-        userGraph.composed['all'].length?
+        userGraph.blacklist['all'].length?
         <FormContainer onSubmit={handleGraph}>
           <FormSelect
                   label='User Tables'
                   placeholder="Select Tables"
                   isMulti
                   name="userTable"
-                  value={userGraph.composed.selected.map((el)=>({value:el,label:el}))}
-                  options={userGraph.composed.all.map((el)=>({value:el,label:el}))}
+                  value={userGraph.blacklist.selected.map((el)=>({value:el,label:el}))}
+                  options={userGraph.blacklist.all.map((el)=>({value:el,label:el}))}
                   onChange={(el)=>(el?setUserGraph({
-                    composed: {...userGraph.composed,selected:el.map(el=>el.value)},
+                    composed: userGraph.composed,
                     pie: userGraph.pie,
-                    versus: userGraph.versus
+                    versus: userGraph.versus,
+                    blacklist: {...userGraph.blacklist,selected:el.map(el=>el.value)}
                   }):
                   setUserGraph({
-                    composed: {...userGraph.composed,selected:[]},
+                    composed: userGraph.composed,
                     pie: userGraph.pie,
-                    versus: userGraph.versus
-                  })
-                  )}
-                  required
-                  />
-          <FormSelect
-                  label='Percision'
-                  placeholder=""
-                  value={{value:userGraph.composed['percision'],label:userGraph.composed['percision']}}
-                  options={[...new Array(10).keys()].map(el=>({value:el+1,label:el+1}))}
-                  onChange={(el)=>(setUserGraph({
-                    composed: {...userGraph.composed,percision:el.value},
-                    pie: userGraph.pie,
-                    versus: userGraph.versus
+                    versus: userGraph.versus,
+                    blacklist: {...userGraph.blacklist,selected:[]}
                   })
                   )}
                   required
@@ -333,18 +347,19 @@ const ComposedChartPage = ({fetchPgStart,pg,isFetching,setUserGraph, userGraph, 
           <FormSelect
                   label='graphType'
                   placeholder=""
-                  value={{value:userGraph.composed['type'],label:userGraph.composed['type']}}
+                  value={{value:userGraph.blacklist['type'],label:userGraph.blacklist['type']}}
                   options={graphType.map(el=>({value:el,label:el}))}
                   onChange={(el)=>(setUserGraph({
-                    composed: {...userGraph.composed,type:el.value},
+                    composed: userGraph.composed,
                     pie: userGraph.pie,
-                    versus: userGraph.versus
+                    versus: userGraph.versus,
+                    blacklist: {...userGraph.blacklist,type:el.value}
                   })
                   )}
                   required
                   />
           {
-            userGraph.composed.selected.length && ! isFetching?
+            userGraph.blacklist.selected.length && ! isFetching?
             <ComposedChartGraphButtonsContainer>
             <CustomButton>Graph Selected</CustomButton>
             <CustomButton
@@ -366,8 +381,8 @@ const ComposedChartPage = ({fetchPgStart,pg,isFetching,setUserGraph, userGraph, 
         <div/>
       }
       {
-        userGraph.composed['graphData'] && userGraph.composed['graphData'].length?
-        <ComposedChartComponent data={ userGraph.composed['graphData']} serialNumber={ userGraph.composed['serialNumber'] } average={ userGraph.composed['average'] } type= {userGraph.composed['type']}/>
+        userGraph.blacklist['graphData'] && userGraph.blacklist['graphData'].length?
+        <ComposedChartComponent data={ userGraph.blacklist['graphData']} serialNumber={ userGraph.blacklist['serialNumber'] } type= {userGraph.blacklist['type']}/>
         :
         <div/>
       }

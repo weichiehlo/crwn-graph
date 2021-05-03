@@ -23,7 +23,13 @@ const INITIAL_STATE = {
     all:[],
     selected:[],
     graphData:{},
-    percision:3}
+    percision:3},
+  blacklist: {
+    all:[],
+    selected:[],
+    graphData:[],
+    serialNumber:{},
+    type:'Bar'}
 };
 
 const graphReducer = (state = INITIAL_STATE, action) => {
@@ -33,7 +39,8 @@ const graphReducer = (state = INITIAL_STATE, action) => {
         ...state,
         composed: action.payload.composed,
         pie: action.payload.pie,
-        versus: action.payload.versus
+        versus: action.payload.versus,
+        blacklist: action.payload.blacklist
       };
     default:
       return state;

@@ -59,7 +59,8 @@ const VersusChartPage = ({fetchPgStart,pg,isFetching,setUserGraph, userGraph}) =
           setUserGraph({
             composed: userGraph.composed,
             pie: userGraph.pie,
-            versus: firebaseGraphs.versus
+            versus: firebaseGraphs.versus,
+            blacklist: userGraph.blacklist
           })
         }
 
@@ -155,7 +156,8 @@ const VersusChartPage = ({fetchPgStart,pg,isFetching,setUserGraph, userGraph}) =
     setUserGraph({
       composed: userGraph.composed,
       pie: userGraph.pie,
-      versus: {...userGraph.versus,all:[...new Set([...userGraph.versus.all,tableName])]}
+      versus: {...userGraph.versus,all:[...new Set([...userGraph.versus.all,tableName])]},
+      blacklist: userGraph.blacklist
     })
     
   };
@@ -204,7 +206,8 @@ const VersusChartPage = ({fetchPgStart,pg,isFetching,setUserGraph, userGraph}) =
     setUserGraph({
       composed: userGraph.composed,
       pie: userGraph.pie,
-      versus: {...userGraph.versus,graphData:convertedDataWithUnit}
+      versus: {...userGraph.versus,graphData:convertedDataWithUnit},
+      blacklist: userGraph.blacklist
     })
     
   }
@@ -219,7 +222,8 @@ const VersusChartPage = ({fetchPgStart,pg,isFetching,setUserGraph, userGraph}) =
     setUserGraph({
       composed: userGraph.composed,
       pie: userGraph.pie,
-      versus: {...userGraph.versus,all:all,selected:[],graphData:[]}
+      versus: {...userGraph.versus,all:all,selected:[],graphData:[]},
+      blacklist: userGraph.blacklist
     })
   }
  
@@ -348,13 +352,15 @@ const VersusChartPage = ({fetchPgStart,pg,isFetching,setUserGraph, userGraph}) =
                     setUserGraph({
                       composed: userGraph.composed,
                       pie: userGraph.pie,
-                      versus: {...userGraph.versus,selected:el.map(el=>el.value)}
+                      versus: {...userGraph.versus,selected:el.map(el=>el.value)},
+                      blacklist: userGraph.blacklist
                     })
                     :
                     setUserGraph({
                       composed: userGraph.composed,
                       pie: userGraph.pie,
-                      versus: {...userGraph.versus,selected:[]}
+                      versus: {...userGraph.versus,selected:[]},
+                      blacklist: userGraph.blacklist
                     })
                     
                     )
@@ -371,7 +377,8 @@ const VersusChartPage = ({fetchPgStart,pg,isFetching,setUserGraph, userGraph}) =
                     setUserGraph({
                       composed: userGraph.composed,
                       pie: userGraph.pie,
-                      versus: {...userGraph.versus,percision:el.value}
+                      versus: {...userGraph.versus,percision:el.value},
+                      blacklist: userGraph.blacklist
                     })
                   }
                   required
