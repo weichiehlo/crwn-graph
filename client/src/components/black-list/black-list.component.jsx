@@ -1,12 +1,15 @@
 import React, {useState} from 'react'
 import { Area, Bar, ComposedChart, Line, CartesianGrid, XAxis, YAxis,Tooltip,Legend,Scatter } from 'recharts';
-import { ComposedChartContainer, Title, RevealContainer,ChartSNContainer, ChartRevealContainer, ChartInfoContainer, AverageContainer, Average} from './black-list.styles'
+import { ComposedChartContainer, Title, RevealContainer,ChartSNContainer, ChartRevealContainer, ChartInfoContainer } from './black-list.styles'
 import { getChartColor } from '../../utils/graph.utils'
 import  CoordinateInfo  from '../coordinate-info/coordinate-info.component'
 import Checkbox from 'rc-checkbox';
 
 
-const ComposedChartComponent = function(props){
+const BlacklistComposedChartComponent = function(props){
+
+
+    console.log(props)
 
     let {data,serialNumber,average,type} = props
     //get sensor name
@@ -61,15 +64,6 @@ const ComposedChartComponent = function(props){
                     }
                     </ComposedChart>
 
-                    <AverageContainer>
-                        {
-                            graphingData.map((entry)=>{
-                                return<Average color= {entry.color} key={entry.id}> {entry.name.slice(0,entry.name.indexOf('('))} Average: {average[entry.name]} {entry.name.split(' ')[entry.name.split(' ').length-1]}</Average>
-                                
-                            })
-                            
-                        }
-                    </AverageContainer>
                     <RevealContainer>
                         <span>Reveal SN</span>
                         <Checkbox
@@ -98,4 +92,4 @@ const ComposedChartComponent = function(props){
 
 
 
-export default ComposedChartComponent
+export default BlacklistComposedChartComponent

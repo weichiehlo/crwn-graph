@@ -310,3 +310,30 @@ export const compareUnit = (sensors)=>{
 }
 
 
+export const convertGraphDataForBlacklistComposed = (data)=>{
+
+
+    let processedData = {processedData:[],detail:{}};
+
+    for(let keyword in data){
+        for(let unit of data[keyword]){
+            if(unit.in_log === 'True'){
+                if(processedData['detail'][keyword] === undefined){
+                    processedData['detail'][keyword] = []
+                }
+                processedData['detail'][keyword].push(unit)
+            }else{
+                break;
+            }
+        }
+    }
+
+    for(let keyword in data){
+        processedData['processedData'].push({[keyword]:((processedData['detail'][keyword].length/data[keyword].length)*100).toFixed(2)+"%"})
+    }
+
+
+    return processedData;
+}
+
+

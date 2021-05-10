@@ -200,6 +200,7 @@ const ComposedChartPage = ({fetchPgStart,pg,isFetching,setUserGraph, userGraph, 
     }
 
     let graphData = convertGraphDataForComposed(raw,userGraph.composed['percision']);
+
     if(compareUnit(Object.keys(raw))){
       setUserGraph({
         composed: {...userGraph.composed,graphData:graphData.processeData,isSameUnit:true,serialNumber:graphData.serialNumber,average:graphData.average},

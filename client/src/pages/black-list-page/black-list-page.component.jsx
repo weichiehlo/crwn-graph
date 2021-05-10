@@ -1,5 +1,5 @@
 import React, {useState,useEffect} from 'react';
-import ComposedChartComponent from '../../components/composed-chart/composed-chart.component'
+import BlacklistComposedChartComponent from '../../components/black-list/black-list.component';
 import { FormContainer, ComposedChartPageContainer, Description, Title, ComposedChartGraphButtonsContainer} from './black-list-page.styles'
 import { FormInput, FormSelect} from '../../components/form-input/form-input.component';
 import CustomButton from '../../components/custom-button/custom-button.component';
@@ -15,7 +15,7 @@ import 'react-date-range/dist/styles.css'; // main style file
 import 'react-date-range/dist/theme/default.css'; // theme css file
 import { DateRangePicker  } from 'react-date-range';
 import { formatDate } from '../../utils/inputs.utils'
-import { convertGraphDataForComposed } from '../../utils/graph.utils'
+import { convertGraphDataForBlacklistComposed } from '../../utils/graph.utils'
 import { getCurrentUser,loadGraphFromFireStore } from '../../firebase/firebase.utils'
 
 
@@ -23,7 +23,7 @@ import { getCurrentUser,loadGraphFromFireStore } from '../../firebase/firebase.u
 
 const ComposedChartPage = ({fetchPgStart,pg,isFetching,setUserGraph, userGraph, selectPgSql}) => {
 
-    const graphType = ['Area', 'Bar', 'Line', 'Scatter'];
+    const graphType = ['Bar'];
 
     const initialState = {
       model: '',
@@ -189,18 +189,19 @@ const ComposedChartPage = ({fetchPgStart,pg,isFetching,setUserGraph, userGraph, 
     event.preventDefault()
     let raw = {};
     for(let table of userGraph.blacklist.selected){
-      console.log(table)
+      raw[table] = pg[table];
     }
 
     console.log(pg)
 
-    let graphData = convertGraphDataForComposed(raw,userGraph.composed['percision']);
+    let graphData = convertGraphDataForBlacklistComposed(raw);
     
-      // setUserGraph({
-      //   composed: {...userGraph.composed,graphData:graphData.processeData,serialNumber:graphData.serialNumber,average:graphData.average},
-      //   pie: userGraph.pie,
-      //   versus: userGraph.versus
-      // })
+      setUserGraph({
+        composed: userGraph.composed,
+        pie: userGraph.pie,
+        versus: userGraph.versus,
+        blacklist: {...userGraph.blacklist,graphData:graphData}
+      })
     
     
   }
@@ -381,8 +382,8 @@ const ComposedChartPage = ({fetchPgStart,pg,isFetching,setUserGraph, userGraph, 
         <div/>
       }
       {
-        userGraph.blacklist['graphData'] && userGraph.blacklist['graphData'].length?
-        <ComposedChartComponent data={ userGraph.blacklist['graphData']} serialNumber={ userGraph.blacklist['serialNumber'] } type= {userGraph.blacklist['type']}/>
+        userGraph.blacklist['graphData'] && userGraph.blacklist['graphData'].processedData && userGraph.blacklist['graphData'].processedData.length?
+        <BlacklistComposedChartComponent data={ userGraph.blacklist['graphData']} serialNumber={ userGraph.blacklist['serialNumber'] } type= {userGraph.blacklist['type']}/>
         :
         <div/>
       }
