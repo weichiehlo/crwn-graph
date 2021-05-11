@@ -9,22 +9,13 @@ import Checkbox from 'rc-checkbox';
 const BlacklistComposedChartComponent = function(props){
 
 
-    console.log(props)
-
-    let {data,serialNumber,average,type} = props
-    //get sensor name
-    const sensorNames = Object.keys(data[0]).filter((el)=>el !=='name')
-    const graphingData = (getChartColor(sensorNames))
-    const [displaySN, setdisplaySN] = useState(false);
-  
     
 
-    // to eliminate the empty serial number list
-    for(let point in serialNumber){
-        if(serialNumber[point].length === 0){
-            delete serialNumber[point]
-        }
-    }
+    let {data,type} = props
+    
+    const graphingData = (getChartColor(Object.keys(data.processedData[0])))
+
+    const [displaySN, setdisplaySN] = useState(false);
 
     return(
         <ComposedChartContainer>
@@ -35,14 +26,14 @@ const BlacklistComposedChartComponent = function(props){
                     <ComposedChart
                     width={1100}
                     height={400}
-                    data={data}
+                    data={data.processedData}
                     margin={{
                         top: 20, right: 20, bottom: 20, left: 20,
                     }}
                     >
                     <CartesianGrid stroke="#f5f5f5" />
                     <XAxis dataKey="name" />
-                    <YAxis type="number" domain={[0, 100]}/>
+                    <YAxis type="number"/>
                     <Tooltip/>
                     <Legend />
                     {
@@ -51,7 +42,7 @@ const BlacklistComposedChartComponent = function(props){
                                 case 'Area':
                                     return (<Area key={entry.id} type="monotone" dataKey={entry.name} fill={entry.color}  stroke={entry.color} unit="%"/>)
                                 case 'Bar':
-                                    return (<Bar key={entry.id} type="monotone" dataKey={entry.name} fill={entry.color}  stroke={entry.color} unit="%"/>)
+                                    return (<Bar key={entry.id} type="monotone"  dataKey={entry.name} fill={entry.color}  stroke={entry.color} unit="%"/>)
                                 case 'Line': 
                                     return (<Line key={entry.id} type="monotone" dataKey={entry.name} fill={entry.color}  stroke={entry.color} unit="%"/>)
                                 case 'Scatter':
@@ -76,9 +67,7 @@ const BlacklistComposedChartComponent = function(props){
                     displaySN?
                     <ChartInfoContainer>
                         {
-                            Object.keys(serialNumber).map((el,id)=>(
-                                <CoordinateInfo key={id} title ={el} serialNumber={[...new Set(serialNumber[el])] } color={graphingData.find(sensor=>sensor.name === el.split('-').slice(0,el.split('-').length-2).join('-'))['color']}/>
-                            ))
+                           
                         }
                     </ChartInfoContainer>
                     :

@@ -383,7 +383,7 @@ const ComposedChartPage = ({fetchPgStart,pg,isFetching,setUserGraph, userGraph, 
       }
       {
         userGraph.blacklist['graphData'] && userGraph.blacklist['graphData'].processedData && userGraph.blacklist['graphData'].processedData.length?
-        <BlacklistComposedChartComponent data={ userGraph.blacklist['graphData']} serialNumber={ userGraph.blacklist['serialNumber'] } type= {userGraph.blacklist['type']}/>
+        <BlacklistComposedChartComponent data={ userGraph.blacklist['graphData']} type= {userGraph.blacklist['type']}/>
         :
         <div/>
       }

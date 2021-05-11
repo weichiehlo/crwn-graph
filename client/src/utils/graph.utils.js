@@ -34,6 +34,7 @@ export const getChartColor = (data)=>{
     return colorMapping
 }
 
+
 export const convertGraphDataForComposed = (data,percision)=>{
 
     let graphingData = [];
@@ -328,10 +329,26 @@ export const convertGraphDataForBlacklistComposed = (data)=>{
         }
     }
 
-    for(let keyword in data){
-        processedData['processedData'].push({[keyword]:((processedData['detail'][keyword].length/data[keyword].length)*100).toFixed(2)+"%"})
-    }
 
+    
+    for(let keyword in data){
+        
+
+        if(processedData['processedData'].length === 0){
+         try{
+            processedData['processedData'].push({[keyword]:((processedData['detail'][keyword].length/data[keyword].length)*100).toFixed(2)})
+            }catch{
+                processedData['processedData'].push({[keyword]:0})
+            }           
+        }else{
+            try{
+                processedData['processedData'][0][keyword] = ((processedData['detail'][keyword].length/data[keyword].length)*100).toFixed(2)
+            }catch{
+                processedData['processedData'][0][keyword] = 0
+            }
+        }
+        
+    }
 
     return processedData;
 }
