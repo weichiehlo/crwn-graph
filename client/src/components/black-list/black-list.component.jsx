@@ -15,7 +15,10 @@ const BlacklistComposedChartComponent = function(props){
     
     const graphingData = (getChartColor(Object.keys(data.processedData[0])))
 
-    const [displaySN, setdisplaySN] = useState(false);
+    const [displayDetail, setdisplayDetail] = useState(false);
+
+    const timeRe = /(\d\d\d\d-\d\d-\d\d)T(\d\d:\d\d:\d\d)/;
+
 
     return(
         <ComposedChartContainer>
@@ -56,18 +59,20 @@ const BlacklistComposedChartComponent = function(props){
                     </ComposedChart>
 
                     <RevealContainer>
-                        <span>Reveal SN</span>
+                        <span>Reveal Detail</span>
                         <Checkbox
-                            onChange={(event)=>setdisplaySN(event.target.checked)}
+                            onChange={(event)=>setdisplayDetail(event.target.checked)}
                         />
                     </RevealContainer>
                 </ChartRevealContainer>
 
                 {
-                    displaySN?
+                    displayDetail?
                     <ChartInfoContainer>
                         {
-                           
+                            Object.keys(data.detail).map((el,id)=>(
+                                <CoordinateInfo key={id} title ={el} serialNumber={[...new Set(data.detail[el].map(item=>item.serial_number+'('+timeRe.exec(item.test_date)[1]+" "+timeRe.exec(item.test_date)[2]+')'))] } color={graphingData.find(blacklist=>blacklist.name === el)['color']}/>
+                            ))
                         }
                     </ChartInfoContainer>
                     :
